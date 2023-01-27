@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract LilSuperfluid {
+contract Superfluid {
 	error Unauthorized();
 	error StreamNotFound();
 	error StreamStillActive();
