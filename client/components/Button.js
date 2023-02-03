@@ -1,6 +1,6 @@
 const Button = (props) => {
   return (
-    <div class="flex space-x-2 justify-start mt-8 mb-10 ml-4">
+    <div class="flex space-x-2 justify-start mt-8 mb-10">
       <button
         type="button"
         data-mdb-ripple="true"
