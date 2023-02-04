@@ -3,6 +3,11 @@ pragma solidity ^0.8.10;
 
 import "./Safe.sol";
 
+/* 
+TASKS
+- add remove safe?
+ */
+
 contract SafeFactory {
     mapping(address => address[]) public safes;
     mapping(address => bool) public isSafe;
@@ -27,5 +32,9 @@ contract SafeFactory {
 
     function getSafesCount(address creator) public view returns (uint256) {
         return safes[creator].length;
+    }
+
+    function getSafes(address creator) public view returns (address[] memory) {
+        return safes[creator];
     }
 }
