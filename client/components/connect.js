@@ -1,35 +1,51 @@
-import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import Button from "./Button";
 
 const Connect = () => {
   const [connected, setConnect] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState();
 
   const handleConnectButton = async () => {
     const { ethereum } = window;
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
     });
-
+    const chainId = await ethereum.request({
+      method: "eth_chainId",
+    });
+    setCurrentAddress(accounts);
     setConnect(true);
-    console.log("connect", setConnect);
+    console.log("chainId", chainId);
   };
+
+  console.log("currentAddress", currentAddress);
+
+  // const provider = new ethers.BrowserProvider(window.ethereum);
 
   return (
     <>
-      {!connected === false ? (
+      {!connected ? (
         <Button onClick={handleConnectButton}> Connect Metamask </Button>
       ) : (
-        <div class="address-container">
-          <li class="address-item">
-            <div class="address-icon-container">
-              <div class="address-icon">
+        <div className="address-container">
+          <li className="address-item">
+            <div className="address-icon-container">
+              <div className="address-icon">
                 <canvas width="36" height="36"></canvas>
               </div>
             </div>
-            <div class="address-details">
-              <h6 class="address-title">0xbcD2...29a1</h6>
-              <p class="address-status">Connected</p>
+            <div className="address-details">
+              <div>
+                <Jazzicon
+                  diameter={25}
+                  seed={jsNumberForAddress(currentAddress)}
+                />
+                <div>
+                  <h6 className="address-title">{currentAddress}</h6>
+                  <p className="address-status">Connected</p>
+                </div>
+              </div>
             </div>
           </li>
         </div>
