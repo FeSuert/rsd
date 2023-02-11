@@ -1,4 +1,5 @@
 import Button from "./Button";
+import ChainName from "./chainName";
 import NavPanel from "./nav_panel";
 import SideBar from "./sidebar";
 
@@ -9,9 +10,7 @@ const Layout = ({ children }) => {
       <div className="flex flex-row container justify-center items-start	max-w-screen-xl mx-auto">
         {children}
       </div>
-      <button type="button" className="network-button">
-        Network
-      </button>
+      <ChainName />
     </div>
   );
 };

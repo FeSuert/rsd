@@ -13,12 +13,19 @@ const SideBar = () => {
       <div className="logo-container">
         <Link className="logo-link" href="/">
           <span>
-            <Image width="200" height="200" alt="logo" src="/imgs/logo.png" />
+            <Image
+              className="mt-5 mb-2"
+              width="200"
+              height="200"
+              alt="logo"
+              src="/imgs/logo.png"
+            />
           </span>
         </Link>
       </div>
-      <Connect />
-
+      <div className="border-y-2 my-2 border-indigo-500/50">
+        <Connect />
+      </div>
       <ul className="nav-list">
         <Link
           className={`${location == "/" ? "Mui-selected" : ""} nav-item`}
