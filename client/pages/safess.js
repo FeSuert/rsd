@@ -3,8 +3,6 @@ import { ethers } from 'ethers'
 import provider from "../scripts/provider"
 import Safe from '../scripts/Safe.js'
 import safeFactory from '../scripts/SafeFactory.js'
-import 'semantic-ui-css/semantic.min.css'
-import { Checkbox, Select, Card, Button, Divider, Form, Input, Loader, Icon, Header, Modal } from 'semantic-ui-react'
 import Layout from "../components/layout";
 
 const Safes = (props) => {
@@ -180,97 +178,120 @@ const Safes = (props) => {
 
   return (
     <Layout>
-      <div style={{ marginTop: 15 }} className="ui centered cards">
-        <div className="ui card" style={{ width: "400px" }}>
-          <div className="content">
-            <Button
-              positive={!!address}
-              primary
-              onClick={handleConnectWalletClick}
-              style={{ width: "370px" }}>
-              {!address ? "Connect to Wallet" : address}
-            </Button>
-          </div>
-          <div>{wallets.map((wallet) => <p key={wallet.toString()}>
-            <span style={{ fontSize: 12 }}>{wallet}</span><button onClick={() => handleConnect(wallet)}>Connect</button>
-          </p>)}</div>
-          <div className="content">
-            <Form style={{ marginLeft: "10px" }} onSubmit={handleCreateSafe}>
-              <div className="ui input">
-                <input min="-999999999" max="9999999999" step="0.0000001"
-                  placeholder="Enter name"
-                  type="text"
-                  value={walletName}
-                  onChange={(e) => setWalletName(e.target.value)}
-                />
-              </div>
-              <div className="ui input">
-                <input min="-999999999" max="9999999999" step="0.0000001"
-                  placeholder="Enter threshold"
-                  type="number"
-                  value={threshold}
-                  onChange={(e) => setThreshold(e.target.value)}
-                />
-              </div>
-              <Button primary style={{ marginLeft: 15, width: 164 }} type="submit">
-                Create Safe
-              </Button>
-            </Form>
-            <Form style={{ marginLeft: "10px" }} onSubmit={handleAddClick}>
-              <Button primary style={{ marginLeft: 15, width: 164 }} type="submit">
-                Add owner
-              </Button>
-              <div className="ui input">
-                <input min="-999999999" max="9999999999" step="0.0000001"
-                  placeholder="Enter name"
-                  type="text"
-                  value={addedSigner}
-                  onChange={(e) => setAddedSigner(e.target.value)}
-                />
-              </div>
-            </Form>
-            <div>{addedSigners.map((signer) => <div key={signer.id}>{signer}</div>)}</div>
-          </div>
-          <div className="content">
-            <div style={{ marginTop: 15, marginBottom: 15 }}><h3>Info</h3></div>
-            <div>Current wallet: {currentWallet}</div>
-            <div>Wallet balance: {walletBalance}</div>
-            <div>Wallet threshold: {walletThreshold}</div>
-            <div>Owners: {currentWalletOwners.map((owner) => <div key={owner.id}>{owner}</div>)}</div>
-            <div style={{ marginTop: 15, marginBottom: 15 }}><h3>Send tokens</h3></div>
-            <Form onSubmit={handleSendTokens}>
-              <Form.Field>
-                <label>Recipient</label>
-                <input type="text" value={sendRecipient} onChange={(e) => setSendRecepient(e.target.value)} placeholder='Recipient' />
-              </Form.Field>
-              <Form.Field>
-                <label>Amount</label>
-                <input type="text" value={sendAmount} onChange={(e) => setSendAmount(e.target.value)} placeholder='Amount' />
-              </Form.Field>
-              <Button type='submit'>Create tx</Button>
-            </Form>
-          </div>
-          <div className="content">
-            <p>My wallets:</p>
-            <p>0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266</p>
-            <p>0x70997970C51812dc3A010C7d01b50e0d17dc79C8</p>
-            <p>0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC</p>
-          </div>
-          <div className="content">
-            <div style={{ marginTop: 15, marginBottom: 15 }}><h3>Signature decode tests</h3></div>
-            <Form onSubmit={handleTests}>
-              <Form.Field>
-                <label>Message</label>
-                <input type="text" value={testMsg} onChange={(e) => setTestMsg(e.target.value)} placeholder='Message' />
-              </Form.Field>
-              <Button type='submit'>Send signature</Button>
-              <Form.Field style={{marginTop: 15}}>
-                <label>Calculated addr: {addrFromSig}</label>
-              </Form.Field>
-            </Form>
-          </div>
+        <div class="mui-style-1qsxih2">
+            <div class="mui-style-1m2k0cd">
+            <div class="MuiGrid-item mui-style-15j76c0">
+                <h2 class="mui-style-1dp9jmp">
+                Create new Safe
+                </h2>
+            </div>
+            <div class="MuiGrid-item mui-style-jpj6gz">
+                <div class="styles_card__KZyC4 mui-style-1dedxvp">
+                <div class="styles_progress__n7o3O mui-style-1iilbmq">
+                    <span class="MuiLinearProgress-root mui-style-1k0tgmg">
+                    <span class="mui-style-1yphw4u">
+                    </span>
+                    </span>
+                </div>
+                    <span class="MuiCardHeader-title mui-style-gxiyii">
+                        Select network and create your Safe
+                    </span>
+                <div class="MuiCardContent-root styles_content__1EARB mui-style-1qw96cp">
+                    <form>
+                    <div class="styles_row__72Qh_">
+                        <div class="mui-style-tuxzvu">
+                        <div class="MuiGrid-item mui-style-efwuvd">
+                            <div class="mui-style-feqhe6">
+                            <label class="mui-style-6fso6q">
+                                Name
+                            </label>
+                            <div class="mui-style-ncsr8s">
+                                <input name="name" placeholder="example-ethereum-safe" type="text" class="mui-style-xtosi7" value=""/>
+                                <fieldset class="mui-style-pz9cy9">
+                                <legend class="mui-style-14lo706">
+                                    <span>
+                                    Name
+                                    </span>
+                                </legend>
+                                </fieldset>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="MuiGrid-item mui-style-1wxaqej">
+                            <div class="styles_select__qyA35">
+                            <div class="styles_select__Yu2wY mui-style-66vfy">
+                                <div class="MuiSelect-select mui-style-1myoznb">
+                                <span class="styles_inlineIndicator__Ec8RB">
+                                    Network: Ethereum
+                                </span>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <hr class="mui-style-9bvjn4"/>
+                    <div class="styles_row__72Qh_">
+                        <div class="mui-style-1ukoe8t">
+                        <button class="mui-style-c6irak" type="submit">
+                            Confirm
+                            <span class="mui-style-w0pj6f">
+                            </span>
+                        </button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+            <div class="MuiGrid-item mui-style-mwsm8z">
+                <div class="mui-style-1h77wgb">
+                <div class="MuiGrid-item mui-style-15j76c0">
+                    <div class="styles_card__qfX73 mui-style-1dedxvp">
+                    <div class="styles_header__n_n1M">
+                        <h4 class="mui-style-3nk0zo">
+                        Your Safe preview
+                        </h4>
+                    </div>
+                    <div class="styles_row__bTL9Q">
+                        <p class="mui-style-10r5yqu">
+                        Wallet
+                        </p>
+                        <div class="styles_container__mHx1M">
+                        <div>
+                            <div class="mui-style-1p0zcpf">
+                            Network: Ethereum
+                            </div>
+                            <div class="mui-style-syhnk2">
+                            <div class="styles_container__rxAZ3">
+                                <div class="styles_avatar__5rCuj">
+                                </div>
+                                </div>
+                                <div class="styles_nameRow___G28i">
+                                <div class="styles_addressRow__52BEb">
+                                    <p class="mui-style-15vi4o">
+                                    <b>
+                                        eth:
+                                    </b>
+                                    <span class="styles_mobileAddress__fIwBR">
+                                        0xbcD2...29a1
+                                    </span>
+                                    <span>
+                                        0xbcD2...29a1
+                                    </span>
+                                    </p>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
         </div>
-      </div>
     </Layout>
   )
 }
