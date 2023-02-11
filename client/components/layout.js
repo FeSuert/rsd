@@ -9,12 +9,9 @@ const Layout = ({ children }) => {
       <div className="flex flex-row container justify-center items-start	max-w-screen-xl mx-auto">
         {children}
       </div>
-      <button
-          type="button"
-          class="network-button">
-          Network
+      <button type="button" className="network-button">
+        Network
       </button>
-
     </div>
   );
 };
