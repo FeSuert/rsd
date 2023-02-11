@@ -12,7 +12,7 @@ const Connect = () => {
       method: "eth_requestAccounts",
     });
     const chainId = await ethereum.request({
-      method: "eth_chainId",
+      method: "chainId",
     });
     setCurrentAddress(accounts);
     setConnect(true);

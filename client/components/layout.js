@@ -4,7 +4,7 @@ import SideBar from "./sidebar";
 
 const Layout = ({ children }) => {
   return (
-    <div>
+    <div className="styles_content__Vufwi">
       <SideBar className="absolute" />
       <div className="flex flex-row container justify-center items-start	max-w-screen-xl mx-auto">
         {children}
