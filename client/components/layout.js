@@ -5,11 +5,13 @@ import SideBar from "./sidebar";
 
 const Layout = ({ children }) => {
   return (
-    <div>
+    <div className="flex">
       <SideBar className="absolute" />
+
       <div className="flex flex-row container justify-center items-start	max-w-screen-xl mx-auto">
         {children}
       </div>
+
       <ChainName />
     </div>
   );
