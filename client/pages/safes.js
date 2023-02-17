@@ -191,9 +191,11 @@ const Safes = (props) => {
               {!address ? "Connect to Wallet" : address}
             </Button>
           </div>
-          <div>{wallets.map((wallet) => <p key={wallet.toString()}>
+          <div>
+            {wallets.map((wallet) => <p key={wallet.toString()}>
             <span style={{ fontSize: 12 }}>{wallet}</span><button onClick={() => handleConnect(wallet)}>Connect</button>
-          </p>)}</div>
+            </p>)}
+          </div>
           <div className="content">
             <Form style={{ marginLeft: "10px" }} onSubmit={handleCreateSafe}>
               <div className="ui input">

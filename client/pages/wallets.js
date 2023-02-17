@@ -5,12 +5,12 @@ import Safe from "../scripts/Safe.js";
 import safeFactory from "../scripts/SafeFactory.js";
 import Layout from "../components/layout";
 
-const Safes = (props) => {
+const Wallets = (props) => {
   const [address, setAddress] = useState("");
   const [wallets, setWallets] = useState([]);
   const [currentWallet, setCurrentWallet] = useState("");
   const [currentWalletOwners, setCurrentWalletOwners] = useState([]);
-  const [threshold, setThreshold] = useState();
+  const [selectedgnosis, setSelectGnosis] = useState();
   const [walletName, setWalletName] = useState();
   const [addedSigners, setAddedSigners] = useState([]);
   const [addedSigner, setAddedSigner] = useState();
@@ -39,16 +39,10 @@ const Safes = (props) => {
     setInputs(inputs.filter((_, i) => i !== index));
   };
 
-  function handleThresholdChange(event) {
+  function handleGnosisChange(event) {
     const index = event.target.value;
-    setThreshold(index);
+    setSelectGnosis(index);
   }
-
-  const options = inputs.map((_, i) => (
-    <option key={i} value={i}>
-      {i + 1}
-    </option>
-  ));
 
   const inputRef = createRef();
 
@@ -102,27 +96,6 @@ const Safes = (props) => {
     }
   };
 
-  const handleCreateSafe = async (event) => {
-    event.preventDefault();
-    const signer = await provider.getSigner();
-    const signerConnected = safeFactory.connect(signer);
-
-    console.log(signers);
-
-    const response = await signerConnected.createSafe(
-      walletName,
-      addedSigners,
-      threshold
-    );
-    await response.wait().then(async (data) => {
-      console.log(data);
-      await safeFactory.getSafes(address).then(async (d) => {
-        setWallets([...wallets, d]);
-      });
-    });
-    setAddedSigners([]);
-  };
-
   const handleSendTokens = async () => {
     const safe = Safe(currentWallet);
     const messageHash = "";
@@ -169,19 +142,23 @@ const Safes = (props) => {
   };
 
   async function handleConnect(wallet) {
-    setCurrentWallet(wallet);
-    const safe = Safe(wallet);
-    await safe.getOwners().then(async (data) => {
-      setCurrentWalletOwners(data);
-    });
+    console.log("here")
+    setCurrentWallet(wallet)
+    const safe = Safe(wallet)
+    await safe.getOwners()
+      .then(async (data) => {
+        setCurrentWalletOwners(data)
+      })
 
-    await provider.getBalance(safe.address).then(async (data) => {
-      setWalletBalance(ethers.utils.formatUnits(data));
-    });
+    await provider.getBalance(safe.address)
+      .then(async (data) => {
+        setWalletBalance(ethers.utils.formatUnits(data))
+      })
 
-    await safe.quorum().then(async (data) => {
-      setWalletThreshold(parseInt(data));
-    });
+    await safe.quorum()
+      .then(async (data) => {
+        setWalletThreshold(parseInt(data))
+      })
   }
 
   const handleTests = async () => {
@@ -198,12 +175,13 @@ const Safes = (props) => {
       });
   };
 
+
   return (
     <Layout>
       <div class="create-new-safe">
         <div class="grid-container">
           <div class="MuiGrid-item grid-item">
-            <h2 class="title">Create new Safe</h2>
+            <h2 class="title">My Wallets</h2>
           </div>
           <div class="MuiGrid-item grid-item">
             <div class="card">
@@ -212,8 +190,8 @@ const Safes = (props) => {
                   <span class="progress-bar-fill"></span>
                 </span>
               </div>
-              {/* Delete this (here is metamask connection) */}
-              <div className="content">
+                            {/* Delete this (here is metamask connection) */}
+                            <div className="content">
                   <button
                     positive={!!address}
                     primary
@@ -222,58 +200,30 @@ const Safes = (props) => {
                     {!address ? "Connect to Wallet" : address}
                   </button>
                 </div>
-                <div>
-                  {wallets.map((wallet) => <p key={wallet.toString()}>
-                  <span style={{ fontSize: 12 }}>{wallet}</span><button onClick={() => handleConnect(wallet)}>Connect</button>
-                  </p>)}
-              </div>
               {/* Delete this (here is metamask connection) */}
-              <span class="card-title">
-                Select network and create your Safe
-              </span>
-              <div class="card-content">
-                <form onSubmit={handleCreateSafe}>
-                  <div class="input-field">
-                    <label for="input-field">Safe Name:</label>
-                    <input 
-                      required 
-                      id="input-field" 
-                      type="text" 
-                      placeholder="example-safe-name"
-                      value={walletName}
-                      onChange={(e) => setWalletName(e.target.value)}/>
+
+              <div>
+                {wallets.map((wallet) => <p key={wallet.toString()}>
+                <span style={{ fontSize: 12 }}>{wallet}</span><button onClick={() => handleConnect(wallet)}>Connect</button>
+                </p>)}
+              </div>
+              <div className="content">
+                <div style={{ marginTop: 15, marginBottom: 15 }}><h3>Info</h3></div>
+                <div>Current wallet: {currentWallet}</div>
+                <div>Wallet balance: {walletBalance}</div>
+                <div>Wallet threshold: {walletThreshold}</div>
+                <div>Owners: {currentWalletOwners.map((owner) => <div key={owner.id}>{owner}</div>)}</div>
+                <div style={{ marginTop: 15, marginBottom: 15 }}><h3>Send tokens</h3></div>
+                <form onSubmit={handleSendTokens}>
+                  <div>
+                    <label>Recipient</label>
+                    <input type="text" value={sendRecipient} onChange={(e) => setSendRecepient(e.target.value)} placeholder='Recipient' />
                   </div>
-                  {inputs.map((value, index) => (
-                    <div class="input-field" key={index}>
-                      <label for="input-field">Owner address:</label>
-                      <input 
-                        required id="input-field" 
-                        type="text" 
-                        placeholder="0x..."
-                        value={value}
-                        onChange={(e) => handleInputChange(index, e.target.value)}
-                      />
-                      <button class="add-owner" onClick={() => handleRemoveInput(index)}>Remove</button>
-                    </div>
-                  ))}
-                  <div class="add-owners-card">
-                  <button onClick={handleAddInput} class="add-owner" type="button">
-                    + Add new owner
-                  </button>
-                  {/* Select threshold */}
-                  <select  class="custom-select" required value={threshold} onChange={handleThresholdChange}>
-                    <option value="" selected disabled>Select Threshold</option>
-                    {options}
-                  </select>
+                  <div>
+                    <label>Amount</label>
+                    <input type="text" value={sendAmount} onChange={(e) => setSendAmount(e.target.value)} placeholder='Amount' />
                   </div>
-                  <hr class="divider" />
-                  <div class="input-row">
-                    <div class="button-container">
-                      <button class="submit-button" type="submit">
-                        Confirm
-                      </button>
-                    </div>
-                  </div>
+                  <button type='submit'>Create tx</button>
                 </form>
               </div>
             </div>
@@ -284,4 +234,4 @@ const Safes = (props) => {
   );
 };
 
-export default Safes;
+export default Wallets;
