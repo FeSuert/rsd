@@ -19,20 +19,21 @@ a {
   position: fixed;
   top: 1rem;
   right: 1rem;
-  display: inline-block; 
+  display: inline-block;
   padding-top: 0.625rem;
-  padding-bottom: 0.625rem; 
+  padding-bottom: 0.625rem;
   padding-left: 1.5rem;
-  padding-right: 1.5rem; 
-  background-color: rgba(102, 113, 255, 0.8); 
-  color: #ffffff; 
+  padding-right: 1.5rem;
+  background-color: rgba(102, 113, 255, 0.8);
+  color: #ffffff;
   font-size: 0.75rem;
-  line-height: 1rem; 
-  font-weight: 500; 
-  line-height: 1.25; 
-  text-transform: uppercase; 
-  border-radius: 0.25rem; 
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+  line-height: 1rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 .network-button:focus {
   background-color: rgba(214, 217, 255, 0.8);
@@ -48,35 +49,35 @@ a {
   transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.logo{
-  position: absolute; 
-  inset: 0px; 
-  box-sizing: border-box; 
-  padding: 0px; 
-  border: none; 
-  margin: auto; 
-  display: block; 
-  width: 0px; 
-  height: 0px; 
-  min-width: 100%; 
-  max-width: 100%; 
-  min-height: 100%; 
+.logo {
+  position: absolute;
+  inset: 0px;
+  box-sizing: border-box;
+  padding: 0px;
+  border: none;
+  margin: auto;
+  display: block;
+  width: 0px;
+  height: 0px;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 100%;
   max-height: 100%;
 }
 
 li.relative {
   align-items: center;
-  margin:0;
-  transition:all .1s;
-  width:100%;
+  margin: 0;
+  transition: all 0.1s;
+  width: 100%;
 }
-li.relative:hover{
-  background:coral;
-  -webkit-transform:scale(1.05);
-  background-color: #2563EB; 
-  color: #ffffff; 
-  box-shadow:0 0 30px -10px #000;
-  fill:white;
+li.relative:hover {
+  background: coral;
+  -webkit-transform: scale(1.05);
+  background-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 0 30px -10px #000;
+  fill: white;
 }
 
 svg.icon {
@@ -85,7 +86,7 @@ svg.icon {
   display: inline-flex;
   align-self: center;
   position: relative;
-  bottom: .125em
+  bottom: 0.125em;
 }
 
 .sidebar {
@@ -99,9 +100,9 @@ svg.icon {
 }
 
 .additional {
-  display: flex; 
-  flex-direction: column; 
-  justify-content: flex-end; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   flex: 1 1 0%;
   padding-bottom: 5px;
 }

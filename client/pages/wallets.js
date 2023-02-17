@@ -178,16 +178,16 @@ const Wallets = (props) => {
 
   return (
     <Layout>
-      <div class="create-new-safe">
-        <div class="grid-container">
-          <div class="MuiGrid-item grid-item">
-            <h2 class="title">My Wallets</h2>
+      <div className="create-new-safe">
+        <div className="grid-container">
+          <div className="MuiGrid-item grid-item">
+            <h2 className="title">Wallets</h2>
           </div>
-          <div class="MuiGrid-item grid-item">
-            <div class="card">
-              <div class="progress-bar">
-                <span class="linear-progress-bar">
-                  <span class="progress-bar-fill"></span>
+          <div className="MuiGrid-item grid-item">
+            <div className="card">
+              <div className="progress-bar">
+                <span className="linear-progress-bar">
+                  <span className="progress-bar-fill"></span>
                 </span>
               </div>
                             {/* Delete this (here is metamask connection) */}
@@ -201,29 +201,52 @@ const Wallets = (props) => {
                   </button>
                 </div>
               {/* Delete this (here is metamask connection) */}
-
-              <div>
-                {wallets.map((wallet) => <p key={wallet.toString()}>
-                <span style={{ fontSize: 12 }}>{wallet}</span><button onClick={() => handleConnect(wallet)}>Connect</button>
-                </p>)}
+              <span className="card-title">
+                Your Gnosis Wallets:
+              </span>
+              <div className="wallets">
+                {wallets.map((wallet) => 
+                  <div className="">
+                    <span className="wallets-name">WalletName</span>
+                    <p className="wallets-item" key={wallet.toString()}>
+                    <div className="wallet-address">{wallet}</div><button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>
+                    </p>
+                  </div>
+                )}
               </div>
-              <div className="content">
-                <div style={{ marginTop: 15, marginBottom: 15 }}><h3>Info</h3></div>
-                <div>Current wallet: {currentWallet}</div>
-                <div>Wallet balance: {walletBalance}</div>
-                <div>Wallet threshold: {walletThreshold}</div>
-                <div>Owners: {currentWalletOwners.map((owner) => <div key={owner.id}>{owner}</div>)}</div>
-                <div style={{ marginTop: 15, marginBottom: 15 }}><h3>Send tokens</h3></div>
+              <hr className="divider" />
+              <span className="card-title">
+              Wallet Info:
+              </span>
+              <div className="wallets">
+                <div className="wallets-name">Current wallet: <div className="wallet-address">{currentWallet}</div></div>
+                <div className="wallets-name">Wallet balance: <div className="wallet-address">{walletBalance}</div></div>
+                <div className="wallets-name">Wallet threshold: <div className="wallet-address">{walletThreshold}</div></div>
+                <div className="wallets-name">Owners: {currentWalletOwners.map((owner) => <div key={owner.id} className="wallet-address">{owner}</div>)}</div>
+                <div className="wallets-name"><h3>Send tokens</h3></div>
+              </div>
+              <hr className="divider" />
+              <span className="card-title">
+               Create Transaction: 
+              </span>
+              <div className="wallets">
                 <form onSubmit={handleSendTokens}>
-                  <div>
+                  <div className="wallets-name">
                     <label>Recipient</label>
                     <input type="text" value={sendRecipient} onChange={(e) => setSendRecepient(e.target.value)} placeholder='Recipient' />
                   </div>
-                  <div>
+                  <div className="wallets-name">
                     <label>Amount</label>
                     <input type="text" value={sendAmount} onChange={(e) => setSendAmount(e.target.value)} placeholder='Amount' />
                   </div>
-                  <button type='submit'>Create tx</button>
+                  <hr className="divider" />
+                  <div className="input-row">
+                    <div className="button-container">
+                      <button className="submit-button" type="submit">
+                        Create tx
+                      </button>
+                    </div>
+                  </div>
                 </form>
               </div>
             </div>

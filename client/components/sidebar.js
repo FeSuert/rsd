@@ -17,7 +17,9 @@ const SideBar = () => {
           </span>
         </Link>
       </div>
-      <Connect />
+      <div className="my-2">
+        <Connect />
+      </div>
 
       <ul className="nav-list">
         <Link
@@ -35,8 +37,8 @@ const SideBar = () => {
               <path d="M3 5v14c0 1.1.89 2 2 2h6V3H5c-1.11 0-2 .9-2 2zm16-2h-6v8h8V5c0-1.1-.9-2-2-2zm-6 18h6c1.1 0 2-.9 2-2v-6h-8v8z"></path>
             </svg>
           </div>
-          <div class="nav-text">
-            <h6 class="nav-link-title">Dashboard</h6>
+          <div className="nav-text">
+            <h6 className="nav-link-title">Dashboard</h6>
           </div>
         </Link>
         <Link
@@ -61,25 +63,6 @@ const SideBar = () => {
           </div>
         </Link>
         <Link
-          className={`${location == "/wrap" ? "Mui-selected" : ""} nav-item`}
-          href="/wrap"
-        >
-          <div className="nav-icon">
-            <svg
-              className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium svg-icon"
-              focusable="false"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              data-testid="ControlPointDuplicateOutlinedIcon"
-            >
-              <path d="M16 8h-2v3h-3v2h3v3h2v-3h3v-2h-3V8zM2 12c0-2.79 1.64-5.2 4.01-6.32V3.52C2.52 4.76 0 8.09 0 12s2.52 7.24 6.01 8.48v-2.16C3.64 17.2 2 14.79 2 12zm13-9c-4.96 0-9 4.04-9 9s4.04 9 9 9 9-4.04 9-9-4.04-9-9-9zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7z"></path>
-            </svg>
-          </div>
-          <div className="nav-text">
-            <h6 className="nav-link-title">Wrap / Unwrap</h6>
-          </div>
-        </Link>
-        <Link
           className={`${location == "/wallets" ? "Mui-selected" : ""} nav-item`}
           href="/wallets"
         >
@@ -99,25 +82,6 @@ const SideBar = () => {
           </div>
         </Link>
         <Link
-          className={`${location == "/history" ? "Mui-selected" : ""} nav-item`}
-          href="/history"
-        >
-          <div className="nav-icon">
-            <svg
-              className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium svg-icon"
-              focusable="false"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              data-testid="HistoryRoundedIcon"
-            >
-              <path d="M13.26 3C8.17 2.86 4 6.95 4 12H2.21c-.45 0-.67.54-.35.85l2.79 2.8c.2.2.51.2.71 0l2.79-2.8c.31-.31.09-.85-.36-.85H6c0-3.9 3.18-7.05 7.1-7 3.72.05 6.85 3.18 6.9 6.9.05 3.91-3.1 7.1-7 7.1-1.61 0-3.1-.55-4.28-1.48-.4-.31-.96-.28-1.32.08-.42.42-.39 1.13.08 1.49C9 20.29 10.91 21 13 21c5.05 0 9.14-4.17 9-9.26-.13-4.69-4.05-8.61-8.74-8.74zm-.51 5c-.41 0-.75.34-.75.75v3.68c0 .35.19.68.49.86l3.12 1.85c.36.21.82.09 1.03-.26.21-.36.09-.82-.26-1.03l-2.88-1.71v-3.4c0-.4-.34-.74-.75-.74z"></path>
-            </svg>
-          </div>
-          <div className="nav-text">
-            <h6 className="nav-link-title">Activity History</h6>
-          </div>
-        </Link>
-        <Link
           className={`${location == "/safes" ? "Mui-selected" : ""} nav-item`}
           href="/safes"
         >
@@ -133,28 +97,7 @@ const SideBar = () => {
             </svg>
           </div>
           <div className="nav-text">
-            <h6 className="nav-link-title">My safes</h6>
-          </div>
-        </Link>
-        <Link
-          className={`${
-            location == "/ecosystem" ? "Mui-selected" : ""
-          } nav-item`}
-          href="/ecosystem"
-        >
-          <div className="nav-icon">
-            <svg
-              className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium svg-icon"
-              focusable="false"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              data-testid="AppsRoundedIcon"
-            >
-              <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"></path>
-            </svg>
-          </div>
-          <div className="nav-text">
-            <h6 className="nav-link-title">Ecosystem</h6>
+            <h6 className="nav-link-title">Create Safe</h6>
           </div>
         </Link>
       </ul>

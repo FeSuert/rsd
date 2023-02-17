@@ -220,7 +220,7 @@
 } 
 
 .progress-bar { 
-    color: rgba(0, 19, 255, 0.8);
+    color: rgba(102, 113, 255, 0.8);
 } 
 
 .linear-progress-bar { 
@@ -279,6 +279,7 @@
 
 .divider { 
     margin: 0px; 
+    margin-top: 15px;
     flex-shrink: 0; 
     border-width: 0px 0px thin; 
     border-style: solid; 
