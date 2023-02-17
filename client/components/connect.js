@@ -1,8 +1,6 @@
 import { useState } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import Button from "./Button";
-import { ethers } from "ethers";
-import provider from "../scripts/provider";
 
 const Connect = ({ children }) => {
   const [connected, setConnect] = useState(false);
@@ -13,19 +11,9 @@ const Connect = ({ children }) => {
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
     });
-    const chainId = await ethereum.request({
-      method: "eth_chainId",
-    });
-
     setCurrentAddress(accounts);
     setConnect(true);
-    console.log("chainId", chainId);
-    // console.log("chainName", chainName());
   };
-
-  console.log("currentAddress", currentAddress);
-
-  // const provider = new ethers.BrowserProvider(window.ethereum);
 
   return (
     <>
