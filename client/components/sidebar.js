@@ -17,7 +17,9 @@ const SideBar = () => {
           </span>
         </Link>
       </div>
-      <Connect />
+      <div className="border-y-2 my-2 border-indigo-500/50">
+        <Connect />
+      </div>
 
       <ul className="nav-list">
         <Link

@@ -1,6 +1,6 @@
 const Button = ({ onClick, children }) => {
   return (
-    <div className="flex space-x-2 justify-start mt-8 mb-10">
+    <div className="flex space-x-2 justify-start mt-3 mb-3">
       <button
         type="button"
         data-mdb-ripple="true"

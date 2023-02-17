@@ -1,8 +1,10 @@
 import { useState } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import Button from "./Button";
+import { ethers } from "ethers";
+import provider from "../scripts/provider";
 
-const Connect = () => {
+const Connect = ({ children }) => {
   const [connected, setConnect] = useState(false);
   const [currentAddress, setCurrentAddress] = useState();
 
@@ -12,11 +14,13 @@ const Connect = () => {
       method: "eth_requestAccounts",
     });
     const chainId = await ethereum.request({
-      method: "chainId",
+      method: "eth_chainId",
     });
+
     setCurrentAddress(accounts);
     setConnect(true);
     console.log("chainId", chainId);
+    // console.log("chainName", chainName());
   };
 
   console.log("currentAddress", currentAddress);
@@ -26,23 +30,26 @@ const Connect = () => {
   return (
     <>
       {!connected ? (
-        <Button onClick={handleConnectButton}> Connect Metamask </Button>
+        <div className="flex justify-center">
+          <Button onClick={handleConnectButton}>Connect Metamask</Button>
+        </div>
       ) : (
-        <div className="address-container">
+        <div className="my-1">
           <li className="address-item">
-            <div className="address-icon-container">
-              <div className="address-icon">
-                <canvas width="36" height="36"></canvas>
-              </div>
+            <Jazzicon diameter={25} seed={jsNumberForAddress(currentAddress)} />
+            {/* <div className="address-icon-container"> */}
+            <div className="address-icon">
+              {/* <canvas width="36" height="36"></canvas> */}
             </div>
+            {/* </div> */}
             <div className="address-details">
               <div>
-                <Jazzicon
-                  diameter={25}
-                  seed={jsNumberForAddress(currentAddress)}
-                />
                 <div>
-                  <h6 className="address-title">{currentAddress}</h6>
+                  <h6 className="address-title">
+                    {currentAddress.toString().slice(0, 5) +
+                      "..." +
+                      currentAddress.toString().slice(38)}
+                  </h6>
                   <p className="address-status">Connected</p>
                 </div>
               </div>
