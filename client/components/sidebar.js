@@ -80,8 +80,8 @@ const SideBar = () => {
           </div>
         </Link>
         <Link
-          className={`${location == "/bridge" ? "Mui-selected" : ""} nav-item`}
-          href="/bridge"
+          className={`${location == "/wallets" ? "Mui-selected" : ""} nav-item`}
+          href="/wallets"
         >
           <div className="nav-icon">
             <svg
@@ -95,7 +95,7 @@ const SideBar = () => {
             </svg>
           </div>
           <div className="nav-text">
-            <h6 className="nav-link-title">Bridge</h6>
+            <h6 className="nav-link-title">Wallets</h6>
           </div>
         </Link>
         <Link
