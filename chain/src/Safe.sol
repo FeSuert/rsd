@@ -18,6 +18,7 @@ contract Safe {
     uint256 public nonce = 1;
     uint256 public quorum;
     bytes32 public immutable domainSeparator;
+    string public name;
 
     mapping(address => bool) public isSigner;
 
@@ -37,17 +38,18 @@ contract Safe {
     address[] private walletOwners;
 
     constructor(
-        string memory name,
-        address[] memory signers,
+        string memory _name,
+        address[] memory _signers,
         uint256 _quorum
     ) payable {
         unchecked {
-            for (uint256 i = 0; i < signers.length; i++)
-                isSigner[signers[i]] = true;
+            for (uint256 i = 0; i < _signers.length; i++)
+                isSigner[_signers[i]] = true;
         }
 
+        name = _name;
         quorum = _quorum;
-        walletOwners = signers;
+        walletOwners = _signers;
 
         domainSeparator = keccak256(
             abi.encode(
