@@ -4,7 +4,7 @@ import cors from "cors";
 
 mongoose.set("strictQuery", false);
 
-await mongoose.connect("mongodb://localhost/sigs");
+await mongoose.connect("mongodb://localhost/rsd");
 
 const Schema = mongoose.Schema;
 
