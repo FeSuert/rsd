@@ -18,7 +18,7 @@ contract Safe {
     uint256 public nonce = 1;
     uint256 public quorum;
     bytes32 public immutable domainSeparator;
-    string public name;
+    uint256 public received;
 
     mapping(address => bool) public isSigner;
 
@@ -38,18 +38,17 @@ contract Safe {
     address[] private walletOwners;
 
     constructor(
-        string memory _name,
-        address[] memory _signers,
+        string memory name,
+        address[] memory signers,
         uint256 _quorum
     ) payable {
         unchecked {
-            for (uint256 i = 0; i < _signers.length; i++)
-                isSigner[_signers[i]] = true;
+            for (uint256 i = 0; i < signers.length; i++)
+                isSigner[signers[i]] = true;
         }
 
-        name = _name;
         quorum = _quorum;
-        walletOwners = _signers;
+        walletOwners = signers;
 
         domainSeparator = keccak256(
             abi.encode(
@@ -178,6 +177,53 @@ contract Safe {
 
     function getOwners() public view returns (address[] memory) {
         return walletOwners;
+    }
+
+    function getMessageHash(
+        bytes32 _funcSignatureHash,
+        address _target,
+        uint256 _amount,
+        bytes calldata _payload
+    ) public view returns (bytes32) {
+        return keccak256(abi.encodePacked(_funcSignatureHash, _target, _amount, _payload, nonce));
+    }
+
+    // ---
+
+    function executeTest(
+        address target,
+        uint256 value,
+        bytes calldata payload,
+        Signature[] calldata sigs
+    ) public payable {
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(
+                    abi.encodePacked(EXECUTE_HASH, target, value, payload, nonce++)
+                )
+            )
+        );
+
+        address sigAddress = ecrecover(
+            digest,
+            sigs[0].v,
+            sigs[0].r,
+            sigs[0].s
+        );
+
+        if (isSigner[sigAddress]) {
+            (bool success, ) = target.call{value: value}(payload);
+        } else {
+            revert(">>> wrong address");
+        }
+
+    }
+
+    function test(string memory _msg, Signature memory sig) public pure returns (address) {
+        bytes32 h = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", keccak256(abi.encodePacked(_msg))));
+        address res = ecrecover(h, sig.v, sig.r, sig.s);
+        return res;
     }
 
     receive() external payable {}
