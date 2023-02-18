@@ -96,9 +96,10 @@ const Wallets = (props) => {
     }
   };
 
-  const handleSendTokens = async () => {
+  const handleSendTokens = async (event) => {
+    event.preventDefault();
     const safe = Safe(currentWallet);
-    const messageHash = "";
+    let messageHash = "";
     await safe.nonce().then((n) => {
       setNonce(parseInt(n));
       console.log(parseInt(n));
