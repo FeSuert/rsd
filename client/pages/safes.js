@@ -107,7 +107,6 @@ const Safes = (props) => {
     const signer = await provider.getSigner()
     const signerConnected = safeFactory.connect(signer)
 
-    console.log("he >", threshold)
     const response = await signerConnected.createSafe(walletName, inputs, threshold)
     await response.wait()
 
@@ -121,7 +120,6 @@ const Safes = (props) => {
     const messageHash = "";
     await safe.nonce().then((n) => {
       setNonce(parseInt(n));
-      console.log(parseInt(n));
       messageHash = ethers.utils.id(
         EXECUTE_HASH + sendRecipient + sendAmount + parseInt(n).toString()
       );
@@ -135,8 +133,6 @@ const Safes = (props) => {
     );
     const sig = ethers.utils.splitSignature(flatSig);
     setSigs([...sigs, sig.toString()]);
-    console.log(sendAmount);
-    console.log(parseInt(sendAmount));
     // const recovered = await Safe(currentWallet).verify({"v": sig.v, "r": sig.r, "s": sig.s});
     const safeSinger = safe.connect(signer);
 
@@ -155,10 +151,6 @@ const Safes = (props) => {
     // await tx.wait()
     //   .then(() => console.log("success"))
     //   .error(() => console.log("error"))
-  };
-
-  const handleAddClick = () => {
-    setAddedSigners([...addedSigners, addedSigner]);
   };
 
   async function handleConnect(wallet) {
@@ -182,7 +174,6 @@ const Safes = (props) => {
     await Safe(currentWallet)
       .test(testMsg, sig)
       .then(async (d) => {
-        console.log("res:", d);
         setAddrFromSig(d);
       });
   };
