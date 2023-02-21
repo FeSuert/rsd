@@ -10,22 +10,30 @@ const Wallets = (props) => {
   const [wallets, setWallets] = useState([]);
   const [currentWallet, setCurrentWallet] = useState("");
   const [currentWalletOwners, setCurrentWalletOwners] = useState([]);
-  const [selectedgnosis, setSelectGnosis] = useState();
-  const [walletName, setWalletName] = useState();
-  const [addedSigners, setAddedSigners] = useState([]);
-  const [addedSigner, setAddedSigner] = useState();
   const [walletBalance, setWalletBalance] = useState();
   const [walletThreshold, setWalletThreshold] = useState();
-  const [signers, setSigners] = useState([]);
-  const [sendRecipient, setSendRecepient] = useState();
-  const [sendAmount, setSendAmount] = useState();
   const [sendRecipient2, setSendRecepient2] = useState();
   const [sendAmount2, setSendAmount2] = useState();
-  const [sigs, setSigs] = useState([]);
-  const [nonce, setNonce] = useState();
-  const [testMsg, setTestMsg] = useState();
-  const [addrFromSig, setAddrFromSig] = useState();
   const [inputs, setInputs] = useState([]);
+  const [waitList, setWaitList] = useState([]);
+  const [currentThreshold, setCurrentTrhreshold] = useState()
+
+  useEffect(() => {
+    if (provider.connection.url === 'metamask') {
+
+      const { provider: ethereum } = provider;
+      ethereum.on('accountsChanged', (accounts) => {
+        setAddress("")
+        setWaitList([])
+        setWallets([])
+        setCurrentWallet()
+        setWalletBalance()
+        setWalletThreshold()
+        setCurrentWalletOwners([])
+      })
+    }
+
+  }, [])
 
   const handleAddInput = () => {
     setInputs([...inputs, ""]);
@@ -94,38 +102,18 @@ const Wallets = (props) => {
     const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
     const sig = ethers.utils.splitSignature(flatSig);
 
-    const response = await postRecord(sendRecipient2, sendAmount2);
+    const response = await postRecord(currentWallet, sendRecipient2, sendAmount2, [address], [sig]);
+
+    const threshold = await safe(currentWallet).quorum()
+    setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
+    const responseRecords = await getRecordByWallet(currentWallet);
+    setWaitList(responseRecords)
   };
 
-  const handleTxWithSignleSig = async (event) => {
-    event.preventDefault();
-
-    const currentSafe = safe(currentWallet);
-    const executeHash = await currentSafe.EXECUTE_HASH();
-    const payload = []
-
-    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient, sendAmount, payload);
-
-    const signer = await provider.getSigner()
-    const safeSinger = currentSafe.connect(signer)
-
-    const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
-    const sig = ethers.utils.splitSignature(flatSig);
-
-    const tx = await safeSinger.executeTest(
-      sendRecipient,
-      sendAmount,
-      payload,
-      [sig],
-      { value: sendAmount }
-    )
-    await tx.wait()
-  }
-
-  const postRecord = async (receiver, amount) => {
+  const postRecord = async (wallet, receiver, amount, approvers, sigs) => {
     const requestOptions = {
       method: "POST",
-      body: JSON.stringify({ receiver, amount }),
+      body: JSON.stringify({ wallet, receiver, amount, approvers, sigs }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -136,11 +124,22 @@ const Wallets = (props) => {
     if (response.status !== 200) {
       throw new Error(data.error);
     }
+    console.log("Response from server: ", data);
+  };
+
+  const getRecordByWallet = async (wallet) => {
+    const response = await fetch(
+      `http://localhost:3003/get_records_by_wallet/${wallet}`
+    );
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
     console.log("Response from server: : ", data);
+    return data.record;
   };
 
   async function handleConnect(wallet) {
-    console.log("here")
     setCurrentWallet(wallet)
     const currentSafe = safe(wallet)
     await currentSafe.getOwners()
@@ -157,6 +156,82 @@ const Wallets = (props) => {
       .then(async (data) => {
         setWalletThreshold(parseInt(data))
       })
+
+    const threshold = await currentSafe.quorum()
+
+    setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
+    const response = await getRecordByWallet(currentWallet);
+    setWaitList(response)
+  }
+
+  const handleRefreshWaitlist = async () => {
+    const responseRecords = await getRecordByWallet(currentWallet);
+    console.log(responseRecords)
+    setWaitList(responseRecords)
+  }
+
+  const postUpdateApprover = async (id, approvers, _sigs) => {
+    const currentSafe = safe(currentWallet);
+    const executeHash = await currentSafe.EXECUTE_HASH();
+    const payload = []
+
+    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient2, sendAmount2, payload);
+
+    const signer = await provider.getSigner()
+
+    const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
+    const sig = ethers.utils.splitSignature(flatSig);
+    const sigsToSend = [..._sigs, sig]
+
+    const requestOptions = {
+      method: "POST",
+      body: JSON.stringify({ id, approvers, sigsToSend }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await fetch(`http://localhost:3003/update_approvers`, requestOptions);
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
+    console.log("Response from server: ", data);
+
+    const bnQuorum = await currentSafe.quorum()
+    const quorum = ethers.utils.formatUnits(bnQuorum, 0)
+    console.log("quorum is:", quorum)
+    const item = await getApproves(id)
+
+    const approves = item[0].approvers.length
+    const sigs = item[0].sigs
+    console.log("approves is:", approves)
+
+    if (quorum <= approves) {
+      const safeSinger = currentSafe.connect(signer)
+      // execute logic
+      console.log("sigs is", sigs)
+      const tx = await safeSinger.executeTest(
+        sendRecipient2,
+        sendAmount2,
+        payload,
+        sigs,
+        { value: sendAmount2 }
+      )
+      await tx.wait()
+    }
+  };
+
+  const getApproves = async (id) => {
+    const response = await fetch(
+      `http://localhost:3003/get_approves_by_id/${id}`
+    );
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
+    console.log("Response from server: : ", data);
+    return data.record;
   }
 
   return (
@@ -191,17 +266,33 @@ const Wallets = (props) => {
                 {wallets.map((wallet) =>
                   <div className="">
                     <span className="wallets-name">WalletName</span>
-                    <p className="wallets-item" key={wallet.toString()}>
-                      <div className="wallet-address">{wallet}</div><button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>
-                    </p>
+                    <div style={{ height: 50 }} className="wallets-item" key={wallet.toString()}>
+                      <div className="wallet-address">{wallet}</div>
+                      {currentWallet != wallet && <button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>}
+                    </div>
                   </div>
                 )}
               </div>
               <hr className="divider" />
               <span className="card-title">
-                Wait list:
+                Waitlist:
               </span>
-              <p style={{ marginLeft: 15 }}>There is no any tx...</p>
+              <div><button className="submit-button" style={{ marginLeft: 10, marginBottom: 10, width: 100, height: 30 }} onClick={() => handleRefreshWaitlist()}>Refresh</button></div>
+              {waitList.length == 0 && <p style={{ marginLeft: 15 }}>There is no any txs...</p>}
+              <div style={{ marginLeft: 15, marginRight: 15 }}>{waitList.map((obj, idx) =>
+                <div>
+                  <hr style={{ marginBottom: 5 }}></hr>
+                  <span>👉 id: {idx} / </span>
+                  <span>receiver: {obj.receiver} / </span>
+                  <span>amount: {obj.amount}</span>
+                  <p>approved: {obj.approvers.length} times out of {currentThreshold} </p>
+                  {!obj.approvers.includes(address) &&
+                    <div>This transaction needs your signature:
+                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
+                      </button>
+                    </div>}
+                </div>
+              )}</div>
               <hr className="divider" />
               <span className="card-title">
                 Wallet Info:
@@ -214,31 +305,7 @@ const Wallets = (props) => {
               </div>
               <hr className="divider" />
               <span className="card-title">
-                Send tx with a single sig:
-              </span>
-              <div className="wallets">
-                <form onSubmit={handleTxWithSignleSig}>
-                  <div className="wallets-name">
-                    <label>Recipient</label>
-                    <input type="text" value={sendRecipient} onChange={(e) => setSendRecepient(e.target.value)} placeholder='Recipient' />
-                  </div>
-                  <div className="wallets-name">
-                    <label>Amount</label>
-                    <input type="text" value={sendAmount} onChange={(e) => setSendAmount(e.target.value)} placeholder='Amount' />
-                  </div>
-                  <hr className="divider" />
-                  <div className="input-row">
-                    <div className="button-container">
-                      <button className="submit-button" type="submit">
-                        Send
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              <hr className="divider" />
-              <span className="card-title">
-                Create tx and send to server:
+                Create transaction:
               </span>
               <div className="wallets">
                 <form onSubmit={handleCreateTx}>

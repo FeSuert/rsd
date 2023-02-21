@@ -18,8 +18,13 @@ contract SafeFactory {
 
         address safeAddress = address(safe);
         safes[msg.sender].push(safeAddress);
-        isSafe[safeAddress] = true;
 
+        for (uint256 idx; idx < _signers.length; idx++) {
+            safes[_signers[idx]].push(safeAddress);
+        }
+
+        isSafe[safeAddress] = true;
+        
         emit SafeCreation(msg.sender, safeAddress);
 
         return safeAddress;
