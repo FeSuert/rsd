@@ -12,7 +12,8 @@ const txRecord = new Schema({
   wallet: String,
   receiver: String,
   amount: String,
-  approvers: Array
+  approvers: Array,
+  sigs: Array
 });
 
 const TxRecord = new mongoose.model("TransactionRecord", txRecord);
@@ -48,6 +49,19 @@ app.get("/get_records_by_wallet/:wallet", async (req, res) => {
   }
 });
 
+app.get("/get_approves_by_id/:id", async (req, res) => {
+  try {
+    const record = await TxRecord.find({ _id: req.params.id });
+    if (!record) {
+      return res.status(404).send({ error: "Ничего не найдено" });
+    }
+    res.send({ record });
+  } catch (error) {
+    console.error(error);
+    res.status(404).send(error);
+  }
+});
+
 app.post("/", async (req, res) => {
   const { wallet, receiver, amount, approvers } = req.body;
 
@@ -64,13 +78,13 @@ app.post("/", async (req, res) => {
 });
 
 app.post("/update_approvers", async (req, res) => {
-  const { wallet, approvers } = req.body;
+  const { id, sigsToSend, approvers } = req.body;
 
-  if (!wallet || !approvers) {
+  if (!id || !approvers || !sigsToSend) {
     return res.status(403).send({ error: "Нужно отправить и апруверов и кошелек" });
   }
   try {
-    const record = await TxRecord.updateOne({ wallet: req.params.wallet }, { $set: { approvers: approvers }});
+    const record = await TxRecord.updateOne({ _id: id }, { $set: { approvers: approvers, sigs: sigsToSend }});
     if (!record) {
       return res.status(404).send({ error: "Ничего не найдено" });
     }
