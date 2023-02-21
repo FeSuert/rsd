@@ -45,7 +45,7 @@ const Safes = (props) => {
   }
 
   const options = inputs.map((_, i) => (
-    <option key={i} value={i}>
+    <option key={i} value={i + 1}>
       {i + 1}
     </option>
   ));
@@ -103,24 +103,17 @@ const Safes = (props) => {
   };
 
   const handleCreateSafe = async (event) => {
-    event.preventDefault();
-    const signer = await provider.getSigner();
-    const signerConnected = safeFactory.connect(signer);
+    event.preventDefault()
+    const signer = await provider.getSigner()
+    const signerConnected = safeFactory.connect(signer)
 
-    console.log(signers);
+    console.log("he >", threshold)
+    const response = await signerConnected.createSafe(walletName, inputs, threshold)
+    await response.wait()
 
-    const response = await signerConnected.createSafe(
-      walletName,
-      addedSigners,
-      threshold
-    );
-    await response.wait().then(async (data) => {
-      console.log(data);
-      await safeFactory.getSafes(address).then(async (d) => {
-        setWallets([...wallets, d]);
-      });
-    });
-    setAddedSigners([]);
+    const walletAddresses = await signerConnected.getSafes(address)
+    setWallets([...wallets, walletAddresses[walletAddresses.length - 1]])
+    setInputs([])
   };
 
   const handleSendTokens = async () => {
@@ -177,10 +170,6 @@ const Safes = (props) => {
 
     await provider.getBalance(safe.address).then(async (data) => {
       setWalletBalance(ethers.utils.formatUnits(data));
-    });
-
-    await safe.quorum().then(async (data) => {
-      setWalletThreshold(parseInt(data));
     });
   }
 

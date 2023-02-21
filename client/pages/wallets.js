@@ -26,6 +26,26 @@ const Wallets = (props) => {
   const [testMsg, setTestMsg] = useState();
   const [addrFromSig, setAddrFromSig] = useState();
   const [inputs, setInputs] = useState([]);
+  const [waitList, setWaitList] = useState([]);
+  const [currentThreshold, setCurrentTrhreshold] = useState()
+  const [approvers, setApprovers] = useState([])
+
+  useEffect(() => {
+    if (provider.connection.url === 'metamask') {
+
+      const { provider: ethereum } = provider;
+      ethereum.on('accountsChanged', (accounts) => {
+        setAddress("")
+        setWaitList([])
+        setWallets([])
+        setCurrentWallet()
+        setWalletBalance()
+        setWalletThreshold()
+        setCurrentWalletOwners([])
+      })
+    }
+
+  }, [])
 
   const handleAddInput = () => {
     setInputs([...inputs, ""]);
@@ -94,7 +114,13 @@ const Wallets = (props) => {
     const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
     const sig = ethers.utils.splitSignature(flatSig);
 
-    const response = await postRecord(sendRecipient2, sendAmount2);
+    const response = await postRecord(currentWallet, sendRecipient2, sendAmount2, [address]);
+
+    const threshold = await safe(currentWallet).quorum()
+    setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
+    const responseRecords = await getRecordByWallet(currentWallet);
+    setWaitList(responseRecords)
+    setApprovers(responseRecords.approvers)
   };
 
   const handleTxWithSignleSig = async (event) => {
@@ -122,10 +148,10 @@ const Wallets = (props) => {
     await tx.wait()
   }
 
-  const postRecord = async (receiver, amount) => {
+  const postRecord = async (wallet, receiver, amount, approvers) => {
     const requestOptions = {
       method: "POST",
-      body: JSON.stringify({ receiver, amount }),
+      body: JSON.stringify({ wallet, receiver, amount, approvers }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -136,11 +162,22 @@ const Wallets = (props) => {
     if (response.status !== 200) {
       throw new Error(data.error);
     }
+    console.log("Response from server: ", data);
+  };
+
+  const getRecordByWallet = async (wallet) => {
+    const response = await fetch(
+      `http://localhost:3003/get_records_by_wallet/${wallet}`
+    );
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
     console.log("Response from server: : ", data);
+    return data.record;
   };
 
   async function handleConnect(wallet) {
-    console.log("here")
     setCurrentWallet(wallet)
     const currentSafe = safe(wallet)
     await currentSafe.getOwners()
@@ -157,7 +194,44 @@ const Wallets = (props) => {
       .then(async (data) => {
         setWalletThreshold(parseInt(data))
       })
+
+    const threshold = await currentSafe.quorum()
+
+    setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
+    const response = await getRecordByWallet(currentWallet);
+    setWaitList(response)
+    setApprovers(response[0].approvers)
   }
+
+  const handleRefreshWaitlist = async () => {
+    const responseRecords = await getRecordByWallet(currentWallet);
+    console.log(responseRecords)
+    setWaitList(responseRecords)
+    setApprovers(responseRecords[0].approvers)
+  }
+
+  const handleSign = async () => {
+    const response = await postUpdateApprover(currentWallet, [...approvers, address])
+
+  }
+
+  const postUpdateApprover = async (wallet, approvers) => {
+
+    const requestOptions = {
+      method: "POST",
+      body: JSON.stringify({ wallet, approvers }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await fetch(`http://localhost:3003/update_approvers`, requestOptions);
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
+    console.log("Response from server: ", data);
+  };
 
   return (
     <Layout>
@@ -191,17 +265,29 @@ const Wallets = (props) => {
                 {wallets.map((wallet) =>
                   <div className="">
                     <span className="wallets-name">WalletName</span>
-                    <p className="wallets-item" key={wallet.toString()}>
-                      <div className="wallet-address">{wallet}</div><button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>
-                    </p>
+                    <div style={{ height: 50 }} className="wallets-item" key={wallet.toString()}>
+                      <div className="wallet-address">{wallet}</div>
+                      {currentWallet != wallet && <button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>}
+                    </div>
                   </div>
                 )}
               </div>
               <hr className="divider" />
               <span className="card-title">
-                Wait list:
+                Waitlist:
               </span>
-              <p style={{ marginLeft: 15 }}>There is no any tx...</p>
+              <div><button className="submit-button" style={{ marginLeft: 10, marginBottom: 10, width: 100, height: 30 }} onClick={() => handleRefreshWaitlist()}>Refresh</button></div>
+              {waitList.length == 0 && <p style={{ marginLeft: 15 }}>There is no any txs...</p>}
+              <div style={{ marginLeft: 15, marginRight: 15 }}>{waitList.map((obj, idx) =>
+                <div>
+                  <hr style={{ marginBottom: 5 }}></hr>
+                  <span>👉 id: {idx} / </span>
+                  <span>receiver: {obj.receiver} / </span>
+                  <span>amount: {obj.amount}</span>
+                  <p>approved: {obj.approvers.length} times out of {currentThreshold} </p>
+                  <div>This transaction needs your signature: {!obj.approvers.includes(address) && <button onClick={() => handleSign()} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign</button>}</div>
+                </div>
+              )}</div>
               <hr className="divider" />
               <span className="card-title">
                 Wallet Info:
