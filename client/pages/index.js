@@ -14,64 +14,13 @@ export default function Home() {
           <div className="mainpage">Unlock the power of collective intelligence with us</div>
           <nav className="mainpage">
             <Link className="mainpage-link" href="/dashboard">
-              App
+            Launch App
             </Link>
             <Link className="mainpage-link" href="/dashboard">
-              App
+            Launch App
             </Link>
             <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
-            </Link>
-            <Link className="mainpage-link" href="/dashboard">
-              App
+            Launch App
             </Link>
           </nav>
 

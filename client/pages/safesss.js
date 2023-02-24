@@ -98,7 +98,8 @@ const Safes = (props) => {
     setAddedSigners([])
   }
 
-  const handleSendTokens = async () => {
+  const handleSendTokens = async (event) => {
+    event.preventDefault();
     const safe = Safe(currentWallet);
     const messageHash = ""
     await safe.nonce()
