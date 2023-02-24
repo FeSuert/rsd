@@ -4,9 +4,18 @@ import '../styles/safes.css'
 import '../styles/wallets.css'
 import '../styles/mainpage.css'
 import '../styles/lds_roller.css'
+import { AppContextProvider } from "../context/AppContext";
+import { Provider } from "../context/Context";
 
 function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+  return (
+    // <AppContextProvider>
+    <Provider>
+      <Component {...pageProps} />
+    </Provider>
+
+    // </AppContextProvider>
+  );
 }
 
-export default MyApp
+export default MyApp;
