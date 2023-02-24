@@ -3,6 +3,7 @@ import '../styles/sidebar.css'
 import '../styles/safes.css'
 import '../styles/wallets.css'
 import '../styles/mainpage.css'
+import '../styles/lds_roller.css'
 import { AppContextProvider } from "../context/AppContext";
 import { Provider } from "../context/Context";
 

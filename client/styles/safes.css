@@ -301,6 +301,8 @@
 } 
 
 .submit-button { 
+    height: 40px;
+    width: 150px;
     display: inline-flex; 
     -webkit-box-align: center; 
     align-items: center; 
