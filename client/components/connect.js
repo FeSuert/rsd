@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import Button from "./Button";
+import { Context } from "../context/Context";
 
 const Connect = ({ children }) => {
-  const [connected, setConnect] = useState(false);
+  const { isConnected, currentAddressContext } = useContext(Context);
+
   const [currentAddress, setCurrentAddress] = useState();
 
   const handleConnectButton = async () => {
@@ -11,20 +13,24 @@ const Connect = ({ children }) => {
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
     });
-    setCurrentAddress(accounts);
-    setConnect(true);
+    setCurrentAddress(accounts[0]);
+
+    sessionStorage.setItem("currentAccount", accounts[0]);
   };
 
   return (
     <>
-      {!connected ? (
+      {!isConnected ? (
         <div className="flex justify-center">
           <Button onClick={handleConnectButton}>Connect Metamask</Button>
         </div>
       ) : (
         <div className="my-1">
           <li className="address-item">
-            <Jazzicon diameter={25} seed={jsNumberForAddress(currentAddress)} />
+            <Jazzicon
+              diameter={25}
+              seed={jsNumberForAddress(currentAddressContext)}
+            />
             {/* <div className="address-icon-container"> */}
             <div className="address-icon">
               {/* <canvas width="36" height="36"></canvas> */}
