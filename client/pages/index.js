@@ -64,6 +64,15 @@ export default function Home() {
             <Link className="mainpage-link" href="/dashboard">
               App
             </Link>
+            <Link className="mainpage-link" href="/dashboard">
+              App
+            </Link>
+            <Link className="mainpage-link" href="/dashboard">
+              App
+            </Link>
+            <Link className="mainpage-link" href="/dashboard">
+              App
+            </Link>
           </nav>
 
         </section>
