@@ -1,0 +1,146 @@
+.circle{
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: ripple 15s infinite;
+  box-shadow: 0px 0px 1px 0px #508fb9;
+}
+
+.small{
+  width: 200px;
+  height: 200px;
+  left: -100px;
+  bottom: -100px;
+}
+
+.medium{
+  width: 400px;
+  height: 400px;
+  left: -200px;
+  bottom: -200px;
+}
+
+.large{
+  width: 600px;
+  height: 600px;
+  left: -300px;
+  bottom: -300px;
+}
+
+.xlarge{
+  width: 800px;
+  height: 800px;
+  left: -400px;
+  bottom: -400px;
+}
+
+.xxlarge{
+  width: 1000px;
+  height: 1000px;
+  left: -500px;
+  bottom: -500px;
+}
+
+.shade1{
+  opacity: 0.2;
+}
+.shade2{
+  opacity: 0.5;
+}
+
+.shade3{
+  opacity: 0.7;
+}
+
+.shade4{
+  opacity: 0.8;
+}
+
+.shade5{
+  opacity: 0.9;
+}
+
+@keyframes ripple{
+  0%{
+    transform: scale(0.8);
+  }
+  
+  50%{
+    transform: scale(1.2);
+  }
+  
+  100%{
+    transform: scale(0.8);
+  }
+}
+
+div.mainmenu {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    min-height: 100vh;
+    font-family: Hack, monospace;
+}
+div.mainpage {
+    font-size: 24px;
+    color: #4d4d4d;
+    text-align: center;
+}
+p.mainpage {
+    margin: 16px;
+    font-size: 96px;
+    color: #ccc;
+    text-transform: uppercase;
+    font-weight: 600;
+    transition: all 1s ease-in-out;
+    position: relative;
+}
+p.mainpage::before {
+    content: attr(data-item);
+    transition: all 1s ease-in-out;
+    color: rgba(0, 19, 255, 0.8);
+    background-color: rgba(145, 153, 255, 0.8);
+    border: 2px solid white;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 0;
+    overflow: hidden;
+}
+p.mainpage:hover::before {
+    width: 100%;
+}
+
+
+nav.mainpage {
+    margin: 25px;
+    background: #f9f9f9;
+    padding: 16px;
+    text-align: center;
+}
+
+.mainpage-link {
+    padding: 15px;
+    z-index: 100;
+    width: 1440px;
+    margin: 16px;
+    font-size: 50px;
+    color: #ccc;
+    text-transform: uppercase;
+    font-weight: 600;
+    transition: all 0.5s ease-in-out;
+}
+
+.mainpage-link:hover {
+  color: rgba(0, 19, 255, 0.8);
+  background-color: rgba(0, 19, 255, 0.8);
+  box-shadow: 0 0 10px rgba(145, 153, 255, 0.8);
+  border-radius: 10px;
+  color: #fff;
+}

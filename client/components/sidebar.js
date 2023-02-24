@@ -40,8 +40,8 @@ const SideBar = () => {
 
       <ul className="nav-list">
         <Link
-          className={`${location == "/" ? "Mui-selected" : ""} nav-item`}
-          href="/"
+          className={`${location == "/dashboard" ? "Mui-selected" : ""} nav-item`}
+          href="/dashboard"
         >
           <div className="nav-icon">
             <svg

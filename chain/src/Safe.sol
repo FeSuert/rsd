@@ -36,26 +36,28 @@ contract Safe {
         );
 
     address[] private walletOwners;
+    string public name;
 
     constructor(
-        string memory name,
-        address[] memory signers,
+        string memory _name,
+        address[] memory _signers,
         uint256 _quorum
     ) payable {
         unchecked {
-            for (uint256 i = 0; i < signers.length; i++)
-                isSigner[signers[i]] = true;
+            for (uint256 i = 0; i < _signers.length; i++)
+                isSigner[_signers[i]] = true;
         }
 
         quorum = _quorum;
-        walletOwners = signers;
+        walletOwners = _signers;
+        name = _name;
 
         domainSeparator = keccak256(
             abi.encode(
                 keccak256(
                     "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
                 ),
-                keccak256(bytes(name)),
+                keccak256(bytes(_name)),
                 keccak256(bytes("1")),
                 block.chainid,
                 address(this)

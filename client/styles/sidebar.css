@@ -52,16 +52,12 @@ html {
     left: 0px; 
     border-width: 0px 1px 0px 0px; 
     border-style: solid; 
-    border-right-color: rgba(0, 0, 0, 0.12); 
+    border-right-color: rgba(0, 0, 0, 0.12);
     width: 260px; 
     border-radius: 0px; 
     border-left-color: initial; 
     border-top-color: initial; 
     border-bottom-color: initial;
-} 
-
-*,:before,:after { 
-    box-sizing: inherit;
 } 
 
 .logo-container { 

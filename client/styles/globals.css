@@ -108,7 +108,7 @@ svg.icon {
 }
 
 body { 
-  background: linear-gradient(-90deg,#d6d6f5,#e6f2ff); 
+  background: linear-gradient(-90deg,#0013ffCC,#9199ffCC); 
   background-size: 200% 200%; 
   animation: styles_gradient__ckMCc 15s ease infinite; 
   border-radius: 6px; 
