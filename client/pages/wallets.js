@@ -17,6 +17,7 @@ const Wallets = (props) => {
   const [inputs, setInputs] = useState([]);
   const [waitList, setWaitList] = useState([]);
   const [currentThreshold, setCurrentTrhreshold] = useState()
+  const [walletName, setWalletName] = useState()
 
   useEffect(() => {
     if (provider.connection.url === 'metamask') {
@@ -156,6 +157,11 @@ const Wallets = (props) => {
       .then(async (data) => {
         setWalletThreshold(parseInt(data))
       })
+
+    currentSafe.name()
+    .then(async (data) => {
+      setWalletName(data)
+    })
 
     const threshold = await currentSafe.quorum()
 
@@ -298,6 +304,7 @@ const Wallets = (props) => {
                 Wallet Info:
               </span>
               <div className="wallets">
+                <div className="wallets-name">Wallet name: <div className="wallet-address">{walletName}</div></div>
                 <div className="wallets-name">Current wallet: <div className="wallet-address">{currentWallet}</div></div>
                 <div className="wallets-name">Wallet balance: <div className="wallet-address">{walletBalance}</div></div>
                 <div className="wallets-name">Wallet threshold: <div className="wallet-address">{walletThreshold}</div></div>
