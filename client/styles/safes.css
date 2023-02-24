@@ -213,10 +213,11 @@
     box-sizing: border-box; 
     border: 2px solid transparent; 
     box-shadow: none;
-} 
-
-.card { 
     border: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 } 
 
 .progress-bar { 
