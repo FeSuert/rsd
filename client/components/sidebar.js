@@ -2,11 +2,23 @@ import Button from "./Button";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Connect from "./connect";
+import { useAppContext } from "../hooks/useAppContext";
+import { Context } from "../context/Context";
 
 const SideBar = () => {
   const location = useRouter().pathname;
+
+  const { currentChainnameContext, currentAddressContext } =
+    useContext(Context);
+  console.log("currentChainnameContext", currentChainnameContext);
+  // const currentAddress = contextState?.currentAccount;
+
+  // useEffect(() => {
+  // const currentAddressFromStorage = sessionStorage.getItem("currentAccount");
+  // console.log("currentAddressFromStorage", currentAddressFromStorage);
+  // }, []);
 
   return (
     <div className="header-container">
@@ -19,6 +31,11 @@ const SideBar = () => {
       </div>
       <div className="my-2">
         <Connect />
+      </div>
+      <div>
+        <p>ChainName from Context: {currentChainnameContext}</p>
+        <p>CurrentAddress from Context: {currentAddressContext}</p>
+        {/* <p>Address from Storage: {currentAddressFromStorage}</p> */}
       </div>
 
       <ul className="nav-list">
