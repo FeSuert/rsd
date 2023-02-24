@@ -1,7 +1,8 @@
 import Button from "./Button";
 import NavPanel from "./nav_panel";
 import SideBar from "./sidebar";
-import { Connect } from "./Connect";
+
+import { Connect } from "./connect";
 import ChainName from "./chainname";
 
 const Layout = ({ children, chainIdName }) => {
