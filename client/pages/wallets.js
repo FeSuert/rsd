@@ -126,8 +126,8 @@ const Wallets = (props) => {
   };
 
   async function handleConnect(wallet) {
-    setCurrentWallet(wallet)
-    const currentSafe = safe(wallet)
+    setCurrentWallet(wallet.addr)
+    const currentSafe = safe(wallet.addr)
     await currentSafe.getOwners()
       .then(async (data) => {
         setCurrentWalletOwners(data)
@@ -251,9 +251,9 @@ const Wallets = (props) => {
               <div className="wallets">
                 {wallets.map((wallet) =>
                   <div className="">
-                    <span className="wallets-name">{safe(currentWallet).name}</span>
+                    <span className="wallets-name">{wallet.name}</span>
                     <div style={{ height: 50 }} className="wallets-item" key={wallet.toString()}>
-                      <div className="wallet-address">{wallet}</div>
+                      <div className="wallet-address">{wallet.addr}</div>
                       {currentWallet != wallet && <button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>}
                     </div>
                   </div>
