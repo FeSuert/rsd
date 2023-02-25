@@ -199,7 +199,7 @@ const Wallets = (props) => {
     if (quorum <= approves) {
       const safeSinger = currentSafe.connect(signer)
       // execute logic
-
+      console.log(">>>", receiver, amount, payload, sigs)
       const tx = await safeSinger.execute(
         receiver,
         amount,
@@ -274,7 +274,7 @@ const Wallets = (props) => {
                   <div className="wallets-name">approved:<span className="wallet-address"> {obj.approvers.length} out of {currentThreshold} </span></div>
                   {!obj.approvers.includes(address) &&
                     <div className="wallets-name">This transaction needs your signature:
-                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
+                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs, obj.receiver, obj.amount)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
                       </button>
                     </div>}
                 </div>
