@@ -14,6 +14,7 @@ const Wallets = (props) => {
   const [walletThreshold, setWalletThreshold] = useState();
   const [sendRecipient2, setSendRecepient2] = useState();
   const [sendAmount2, setSendAmount2] = useState();
+  const [walletName, setWalletName] = useState();
   const [inputs, setInputs] = useState([]);
   const [waitList, setWaitList] = useState([]);
   const [currentThreshold, setCurrentTrhreshold] = useState()
@@ -30,6 +31,7 @@ const Wallets = (props) => {
         setCurrentWallet()
         setWalletBalance()
         setWalletThreshold()
+        setWalletName()
         setCurrentWalletOwners([])
       })
     }
@@ -135,6 +137,7 @@ const Wallets = (props) => {
     const data = await response.json();
     if (response.status !== 200) {
       throw new Error(data.error);
+
     }
     console.log("Response from server: : ", data);
     return data.record;
@@ -152,6 +155,11 @@ const Wallets = (props) => {
       .then(async (data) => {
         setWalletBalance(ethers.utils.formatUnits(data))
       })
+
+    await provider.getBalance(currentSafe.name)
+    .then(async (data) => {
+      setWalletName(ethers.utils.formatUnits(data))
+    })
 
     await currentSafe.quorum()
       .then(async (data) => {
@@ -265,13 +273,19 @@ const Wallets = (props) => {
                 </button>
               </div>
               {/* Delete this (here is metamask connection) */}
-              <span className="card-title">
+              {address ? 
+              (<span className="card-title">
                 Your Gnosis Wallets:
-              </span>
+              </span>)
+                :
+              (<span className="card-title">
+                Connect to your Wallet!
+              </span>)
+              } 
               <div className="wallets">
                 {wallets.map((wallet) =>
                   <div className="">
-                    <span className="wallets-name">WalletName</span>
+                    <span className="wallets-name">{wallet}</span>
                     <div style={{ height: 50 }} className="wallets-item" key={wallet.toString()}>
                       <div className="wallet-address">{wallet}</div>
                       {currentWallet != wallet && <button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>}
@@ -279,6 +293,8 @@ const Wallets = (props) => {
                   </div>
                 )}
               </div>
+              {currentWallet ? (
+              <div>
               <hr className="divider" />
               <span className="card-title">
                 Waitlist:
@@ -304,7 +320,7 @@ const Wallets = (props) => {
                 Wallet Info:
               </span>
               <div className="wallets">
-                <div className="wallets-name">Wallet name: <div className="wallet-address">{walletName}</div></div>
+                <div className="wallets-name">Wallet Name: <div className="wallet-address">{walletName}</div></div>
                 <div className="wallets-name">Current wallet: <div className="wallet-address">{currentWallet}</div></div>
                 <div className="wallets-name">Wallet balance: <div className="wallet-address">{walletBalance}</div></div>
                 <div className="wallets-name">Wallet threshold: <div className="wallet-address">{walletThreshold}</div></div>
@@ -334,6 +350,7 @@ const Wallets = (props) => {
                   </div>
                 </form>
               </div>
+              </div>) : <div></div>}
             </div>
           </div>
         </div>

@@ -213,10 +213,11 @@
     box-sizing: border-box; 
     border: 2px solid transparent; 
     box-shadow: none;
-} 
-
-.card { 
     border: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 } 
 
 .progress-bar { 
@@ -300,6 +301,8 @@
 } 
 
 .submit-button { 
+    height: 40px;
+    width: 150px;
     display: inline-flex; 
     -webkit-box-align: center; 
     align-items: center; 

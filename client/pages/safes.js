@@ -24,6 +24,7 @@ const Safes = (props) => {
   const [testMsg, setTestMsg] = useState();
   const [addrFromSig, setAddrFromSig] = useState();
   const [inputs, setInputs] = useState([]);
+  const [creatingSafe, setCreatingSafe] = useState(false);
 
   const handleAddInput = () => {
     setInputs([...inputs, ""]);
@@ -107,12 +108,20 @@ const Safes = (props) => {
     const signer = await provider.getSigner()
     const signerConnected = safeFactory.connect(signer)
 
-    const response = await signerConnected.createSafe(walletName, inputs, threshold)
-    await response.wait()
+    setCreatingSafe(true); 
 
-    const walletAddresses = await signerConnected.getSafes(address)
-    setWallets([...wallets, walletAddresses[walletAddresses.length - 1]])
-    setInputs([])
+    try {
+      const response = await signerConnected.createSafe(walletName, inputs, threshold);
+      await response.wait();
+  
+      const walletAddresses = await signerConnected.getSafes(address);
+      setWallets([...wallets, walletAddresses[walletAddresses.length - 1]]);
+      setInputs([]);
+      setCreatingSafe(false);
+    } catch (error) {
+      console.log('Error creating safe:', error);
+      setCreatingSafe(false);
+    }
   };
 
   const handleSendTokens = async () => {
@@ -247,7 +256,11 @@ const Safes = (props) => {
                   <div className="input-row">
                     <div className="button-container">
                       <button className="submit-button" type="submit">
-                        Confirm
+                      {creatingSafe ? (
+                          <span class="loader"></span>
+                        ) : (
+                          <p>Create</p>
+                        )}
                       </button>
                     </div>
                   </div>

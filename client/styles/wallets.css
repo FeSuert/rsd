@@ -5,7 +5,6 @@
 .wallets-name {
     outline: 0px; 
     border: 0px; 
-    margin-left: 40px; 
     margin-top: 5px;
     margin-bottom: 5px;
     font-weight: bold; 
@@ -24,7 +23,6 @@
     border: 0px; 
     cursor: pointer; 
     user-select: none; 
-    vertical-align: middle; 
     appearance: none; 
     color: inherit; 
     display: flex; 
@@ -58,3 +56,4 @@
     color: #555;
     border: none;
 }
+
