@@ -2,7 +2,7 @@ import provider from './provider'
 import { ethers } from 'ethers'
 import { abi } from '../../chain/out/SafeFactory.sol/SafeFactory.json'
 
-const contract_address = "0xECFA41E83a8BEeE6A648dD41c01ac29D9d61eF96"
+const contract_address = "0x00aacC64aaCF9a2A1fC51C31EB3989CFb0415cEf"
 
 const SafeFactory = new ethers.Contract(contract_address, abi, provider)
 
