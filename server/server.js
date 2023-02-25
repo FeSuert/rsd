@@ -9,15 +9,18 @@ await mongoose.connect("mongodb://localhost/rsd");
 const Schema = mongoose.Schema;
 
 const txRecord = new Schema({
+  wallet: String,
   receiver: String,
-  amount: String
+  amount: String,
+  approvers: Array,
+  sigs: Array
 });
 
 const TxRecord = new mongoose.model("TransactionRecord", txRecord);
 
 var corsOptions = {
   origin: 'http://localhost:3000',
-  optionsSuccessStatus: 200 
+  optionsSuccessStatus: 200
 }
 
 const app = express();
@@ -33,9 +36,22 @@ app.get("/", async (req, res) => {
   res.send({ records });
 });
 
-app.get("/get_record_by_hash/:hash", async (req, res) => {
+app.get("/get_records_by_wallet/:wallet", async (req, res) => {
   try {
-    const record = await TxRecord.findOne({ hash: req.params.hash });
+    const record = await TxRecord.find({ wallet: req.params.wallet });
+    if (!record) {
+      return res.status(404).send({ error: "Ничего не найдено" });
+    }
+    res.send({ record });
+  } catch (error) {
+    console.error(error);
+    res.status(404).send(error);
+  }
+});
+
+app.get("/get_approves_by_id/:id", async (req, res) => {
+  try {
+    const record = await TxRecord.find({ _id: req.params.id });
     if (!record) {
       return res.status(404).send({ error: "Ничего не найдено" });
     }
@@ -47,17 +63,35 @@ app.get("/get_record_by_hash/:hash", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  const { receiver, amount } = req.body;
-  if (!receiver || !amount) {
+  const { wallet, receiver, amount, approvers, sigs } = req.body;
+
+  if (!wallet || !receiver || !amount || !sigs) {
     return res.status(403).send({ error: "Нужно отправить и хэш и текст." });
   }
-  const record = new TxRecord({ receiver, amount });
+  const record = new TxRecord({ wallet, receiver, amount, approvers, sigs });
   try {
     await record.save();
   } catch (error) {
     return res.status(500).send({ error: error.message });
   }
   res.send({ record });
+});
+
+app.post("/update_approvers", async (req, res) => {
+  const { id, sigsToSend, approvers } = req.body;
+
+  if (!id || !approvers || !sigsToSend) {
+    return res.status(403).send({ error: "Нужно отправить и апруверов и кошелек" });
+  }
+  try {
+    const record = await TxRecord.updateOne({ _id: id }, { $set: { approvers: approvers, sigs: sigsToSend }});
+    if (!record) {
+      return res.status(404).send({ error: "Ничего не найдено" });
+    }
+    res.send({ record });
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 3003;

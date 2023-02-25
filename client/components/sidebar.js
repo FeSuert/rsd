@@ -12,7 +12,7 @@ const SideBar = () => {
 
   const { currentChainnameContext, currentAddressContext } =
     useContext(Context);
-  console.log("currentChainnameContext", currentChainnameContext);
+  // console.log("currentChainnameContext", currentChainnameContext);
   // const currentAddress = contextState?.currentAccount;
 
   // useEffect(() => {
@@ -40,8 +40,8 @@ const SideBar = () => {
 
       <ul className="nav-list">
         <Link
-          className={`${location == "/" ? "Mui-selected" : ""} nav-item`}
-          href="/"
+          className={`${location == "/dashboard" ? "Mui-selected" : ""} nav-item`}
+          href="/dashboard"
         >
           <div className="nav-icon">
             <svg

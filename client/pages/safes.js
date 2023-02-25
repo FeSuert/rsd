@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef, createRef } from "react";
+import React, { useState, useEffect, useRef, createRef, useContext } from "react";
 import { ethers } from "ethers";
 import provider from "../scripts/provider";
 import Safe from "../scripts/Safe.js";
 import safeFactory from "../scripts/SafeFactory.js";
 import Layout from "../components/layout";
+import { useAppContext } from "../hooks/useAppContext";
+import { Context } from "../context/Context";
 
 const Safes = (props) => {
   const [address, setAddress] = useState("");
@@ -24,6 +26,13 @@ const Safes = (props) => {
   const [testMsg, setTestMsg] = useState();
   const [addrFromSig, setAddrFromSig] = useState();
   const [inputs, setInputs] = useState([]);
+  const [creatingSafe, setCreatingSafe] = useState(false);
+
+  const { currentChainnameContext, currentAddressContext } = useContext(Context);
+
+  useEffect(() => {
+    if(currentAddressContext){setAddress(currentAddressContext[0])}
+  }, [currentAddressContext])
 
   const handleAddInput = () => {
     setInputs([...inputs, ""]);
@@ -45,7 +54,7 @@ const Safes = (props) => {
   }
 
   const options = inputs.map((_, i) => (
-    <option key={i} value={i}>
+    <option key={i} value={i + 1}>
       {i + 1}
     </option>
   ));
@@ -58,67 +67,25 @@ const Safes = (props) => {
     "Execute(address target,uint256 value,bytes payload,uint256 nonce)"
   );
 
-  useEffect(() => {
-    if (provider.connection.url === "metamask") {
-      // provider.send("eth_requestAccounts", []) // задаем текущий адрес
-      // .then((accounts) => {
-      //   setAddress(accounts[0])
-      // })
-      // .catch((error) => console.log(error))
-
-      const { provider: ethereum } = provider;
-      ethereum.on("accountsChanged", (accounts) => {
-        setAddress("");
-      });
-    }
-  }, []);
-
-  const handleConnectWalletClick = async () => {
-    try {
-      const { ethereum } = window;
-
-      if (!ethereum) {
-        console.log("Metamask not detected");
-        return;
-      }
-      let chainId = await ethereum.request({ method: "eth_chainId" });
-
-      await ethereum
-        .request({
-          method: "eth_requestAccounts",
-        })
-        .then(async (data) => {
-          setAddress(data[0]);
-          try {
-            await safeFactory.getSafes(data[0]).then(async (d) => {
-              setWallets(d);
-            });
-          } catch (error) {
-            console.log(error);
-          }
-        });
-    } catch (error) {
-      console.log("Error connecting to metamask", error);
-    }
-  };
-
   const handleCreateSafe = async (event) => {
-    console.log(inputs)
-    event.preventDefault();
-    const signer = await provider.getSigner();
-    const signerConnected = safeFactory.connect(signer);
+    event.preventDefault()
+    const signer = await provider.getSigner()
+    const signerConnected = safeFactory.connect(signer)
 
-    const response = await signerConnected.createSafe(
-      walletName,
-      inputs,
-      threshold
-    );
-    await response.wait().then(async (data) => {
-      await safeFactory.getSafes(address).then(async (d) => {
-        setWallets([...wallets, d]);
-      });
-    });
-    setInputs([]);
+    setCreatingSafe(true); 
+
+    try {
+      const response = await signerConnected.createSafe(walletName, inputs, threshold);
+      await response.wait();
+  
+      const walletAddresses = await signerConnected.getSafes(address);
+      setWallets([...wallets, walletAddresses[walletAddresses.length - 1]]);
+      setInputs([]);
+      setCreatingSafe(false);
+    } catch (error) {
+      console.log('Error creating safe:', error);
+      setCreatingSafe(false);
+    }
   };
 
   const handleSendTokens = async () => {
@@ -169,10 +136,6 @@ const Safes = (props) => {
     await provider.getBalance(safe.address).then(async (data) => {
       setWalletBalance(ethers.utils.formatUnits(data));
     });
-
-    await safe.quorum().then(async (data) => {
-      setWalletThreshold(parseInt(data));
-    });
   }
 
   const handleTests = async () => {
@@ -202,19 +165,6 @@ const Safes = (props) => {
                   <span className="progress-bar-fill"></span>
                 </span>
               </div>
-              {/* Delete this (here is metamask connection) */}
-              <div className="content">
-                  <button
-                    positive={!!address}
-                    primary
-                    onClick={handleConnectWalletClick}
-                    style={{ width: "370px" }}>
-                    {!address ? "Connect to Wallet" : address}
-                  </button>
-                </div>
-                <div>
-              </div>
-              {/* Delete this (here is metamask connection) */}
               <span className="card-title">
                 Select network and create your Safe
               </span>
@@ -257,7 +207,11 @@ const Safes = (props) => {
                   <div className="input-row">
                     <div className="button-container">
                       <button className="submit-button" type="submit">
-                        Confirm
+                      {creatingSafe ? (
+                          <span class="loader"></span>
+                        ) : (
+                          <p>Create</p>
+                        )}
                       </button>
                     </div>
                   </div>
