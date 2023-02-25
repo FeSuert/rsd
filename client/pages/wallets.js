@@ -18,7 +18,6 @@ const Wallets = (props) => {
   const [inputs, setInputs] = useState([]);
   const [waitList, setWaitList] = useState([]);
   const [currentThreshold, setCurrentTrhreshold] = useState()
-  const [walletName, setWalletName] = useState()
 
   useEffect(() => {
     if (provider.connection.url === 'metamask') {
