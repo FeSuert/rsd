@@ -1,26 +1,23 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import Button from "./Button";
 import { Context } from "../context/Context";
 
 const Connect = ({ children }) => {
-  const { isConnected, currentAddressContext } = useContext(Context);
-
-  const [currentAddress, setCurrentAddress] = useState();
+  const { currentAddressContext } = useContext(Context);
 
   const handleConnectButton = async () => {
     const { ethereum } = window;
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
     });
-    setCurrentAddress(accounts[0]);
 
     sessionStorage.setItem("currentAccount", accounts[0]);
   };
-
+  console.log("currentAddressContext", currentAddressContext);
   return (
     <>
-      {!isConnected ? (
+      {!currentAddressContext ? (
         <div className="flex justify-center">
           <Button onClick={handleConnectButton}>Connect Metamask</Button>
         </div>
@@ -29,19 +26,17 @@ const Connect = ({ children }) => {
           <li className="address-item">
             <Jazzicon
               diameter={25}
-              seed={jsNumberForAddress(currentAddressContext)}
+              seed={jsNumberForAddress(currentAddressContext.toString())}
             />
-            {/* <div className="address-icon-container"> */}
-            <div className="address-icon">
-              {/* <canvas width="36" height="36"></canvas> */}
-            </div>
+
+            <div className="address-icon"></div>
             <div className="address-details">
               <div>
                 <div>
                   <h6 className="address-title">
-                    {currentAddress.toString().slice(0, 5) +
+                    {currentAddressContext.toString().slice(0, 5) +
                       "..." +
-                      currentAddress.toString().slice(38)}
+                      currentAddressContext.toString().slice(38)}
                   </h6>
                   <p className="address-status">Connected</p>
                 </div>
