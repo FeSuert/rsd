@@ -27,6 +27,7 @@ const Safes = (props) => {
   const [addrFromSig, setAddrFromSig] = useState();
   const [inputs, setInputs] = useState([]);
   const [creatingSafe, setCreatingSafe] = useState(false);
+  const [createdSafe, setCreatedSafe] = useState(false);
 
   const { currentChainnameContext, currentAddressContext } = useContext(Context);
 
@@ -79,12 +80,17 @@ const Safes = (props) => {
       await response.wait();
   
       const walletAddresses = await signerConnected.getSafes(address);
-      setWallets([...wallets, walletAddresses[walletAddresses.length - 1]]);
-      setInputs([]);
-      setCreatingSafe(false);
+      setCreatedSafe(true);
+      setTimeout(() => {
+        setWallets([...wallets, walletAddresses[walletAddresses.length - 1]]);
+        setInputs([]);
+        setCreatingSafe(false);
+        setCreatedSafe(false);
+      }, 3000)
     } catch (error) {
       console.log('Error creating safe:', error);
       setCreatingSafe(false);
+      setCreatedSafe(false);
     }
   };
 
@@ -207,13 +213,17 @@ const Safes = (props) => {
                     <hr className="divider" />
                     <div className="input-row">
                       <div className="button-container">
+                      {createdSafe ? (
+                        <button className="success-button" type="submit">
+                          <p>Success</p>
+                        </button>) : ( 
                         <button className="submit-button" type="submit">
-                        {creatingSafe ? (
+                            {creatingSafe ? (
                             <span class="loader"></span>
                           ) : (
                             <p>Create</p>
                           )}
-                        </button>
+                        </button>)}
                       </div>
                     </div>
                   </form>

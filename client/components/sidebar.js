@@ -32,11 +32,6 @@ const SideBar = () => {
       <div className="my-2">
         <Connect />
       </div>
-      <div>
-        <p>ChainName from Context: {currentChainnameContext}</p>
-        <p>CurrentAddress from Context: {currentAddressContext}</p>
-        {/* <p>Address from Storage: {currentAddressFromStorage}</p> */}
-      </div>
 
       <ul className="nav-list">
         <Link

@@ -1,0 +1,37 @@
+
+ul.my-list {
+    counter-reset: index;  
+    padding: 0;
+  }
+  
+  /* List element */
+  li.my-list {
+    counter-increment: index; 
+    align-items: center;
+    box-sizing: border-box;
+    border: 2px solid black;
+    font-size: 16px;
+    padding: 10px;
+    transition: border-color 0.3s;
+  }
+  
+  
+  /* Element counter */
+  li.my-list::before {
+    content: counters(index, ".", decimal-leading-zero);
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+    align-self: flex-start;
+    background-image: linear-gradient(to bottom, #80b3ff, #ffccff);
+    background-attachment: fixed;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  
+  /* Element separation */
+  li.my-list + li.my-list {
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+  
