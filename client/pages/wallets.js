@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef, createRef } from "react";
+import React, { useState, useEffect, useRef, createRef, useContext } from "react";
 import { ethers } from "ethers";
 import provider from "../scripts/provider";
 import safe from "../scripts/Safe.js";
 import safeFactory from "../scripts/SafeFactory.js";
 import Layout from "../components/layout";
+import { useAppContext } from "../hooks/useAppContext";
+import { Context } from "../context/Context";
 
 const Wallets = (props) => {
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState();
   const [wallets, setWallets] = useState([]);
   const [currentWallet, setCurrentWallet] = useState("");
   const [currentWalletOwners, setCurrentWalletOwners] = useState([]);
@@ -18,14 +20,17 @@ const Wallets = (props) => {
   const [inputs, setInputs] = useState([]);
   const [waitList, setWaitList] = useState([]);
   const [currentThreshold, setCurrentTrhreshold] = useState()
-  const [walletName, setWalletName] = useState()
+  
+
+  const { currentChainnameContext, currentAddressContext } = useContext(Context);
 
   useEffect(() => {
-    if (provider.connection.url === 'metamask') {
+    if(currentAddressContext){setAddress(currentAddressContext[0])}
+  }, [currentAddressContext])
 
-      const { provider: ethereum } = provider;
-      ethereum.on('accountsChanged', (accounts) => {
-        setAddress("")
+  useEffect(() => {
+    if (address) {
+        handleConnectWallet()
         setWaitList([])
         setWallets([])
         setCurrentWallet()
@@ -33,10 +38,9 @@ const Wallets = (props) => {
         setWalletThreshold()
         setWalletName()
         setCurrentWalletOwners([])
-      })
     }
 
-  }, [])
+  }, [address])
 
   const handleAddInput = () => {
     setInputs([...inputs, ""]);
@@ -61,33 +65,11 @@ const Wallets = (props) => {
 
   const bnbChainId = "0x38";
 
-  const handleConnectWalletClick = async () => {
-    try {
-      const { ethereum } = window;
-
-      if (!ethereum) {
-        console.log("Metamask not detected");
-        return;
-      }
-      let chainId = await ethereum.request({ method: "eth_chainId" });
-
-      await ethereum
-        .request({
-          method: "eth_requestAccounts",
-        })
-        .then(async (data) => {
-          setAddress(data[0]);
-          try {
-            await safeFactory.getSafes(data[0]).then(async (d) => {
-              setWallets(d);
-            });
-          } catch (error) {
-            console.log(error);
-          }
-        });
-    } catch (error) {
-      console.log("Error connecting to metamask", error);
-    }
+  const handleConnectWallet = async () => {
+    safeFactory.getSafes(address).then(async (d) => {
+      console.log(d)
+      setWallets(d);
+    });
   };
 
   const handleCreateTx = async (event) => {
@@ -156,20 +138,15 @@ const Wallets = (props) => {
         setWalletBalance(ethers.utils.formatUnits(data))
       })
 
-    await provider.getBalance(currentSafe.name)
+    await currentSafe.name()
     .then(async (data) => {
-      setWalletName(ethers.utils.formatUnits(data))
+      setWalletName(data)
     })
 
     await currentSafe.quorum()
       .then(async (data) => {
         setWalletThreshold(parseInt(data))
       })
-
-    currentSafe.name()
-    .then(async (data) => {
-      setWalletName(data)
-    })
 
     const threshold = await currentSafe.quorum()
 
@@ -262,17 +239,6 @@ const Wallets = (props) => {
                   <span className="progress-bar-fill"></span>
                 </span>
               </div>
-              {/* Delete this (here is metamask connection) */}
-              <div className="content">
-                <button
-                  /* positive={!!address} 
-                  primary */
-                  onClick={handleConnectWalletClick}
-                  style={{ width: "370px" }}>
-                  {!address ? "Connect to Wallet" : address}
-                </button>
-              </div>
-              {/* Delete this (here is metamask connection) */}
               {address ? 
               (<span className="card-title">
                 Your Gnosis Wallets:
@@ -285,7 +251,7 @@ const Wallets = (props) => {
               <div className="wallets">
                 {wallets.map((wallet) =>
                   <div className="">
-                    <span className="wallets-name">{wallet}</span>
+                    <span className="wallets-name">{safe(currentWallet).name}</span>
                     <div style={{ height: 50 }} className="wallets-item" key={wallet.toString()}>
                       <div className="wallet-address">{wallet}</div>
                       {currentWallet != wallet && <button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>}
