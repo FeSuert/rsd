@@ -96,6 +96,7 @@ const Wallets = (props) => {
   };
 
   const postRecord = async (wallet, receiver, amount, approvers, sigs) => {
+
     const requestOptions = {
       method: "POST",
       body: JSON.stringify({ wallet, receiver, amount, approvers, sigs }),
@@ -157,22 +158,22 @@ const Wallets = (props) => {
 
   const handleRefreshWaitlist = async () => {
     const responseRecords = await getRecordByWallet(currentWallet);
-    console.log(responseRecords)
     setWaitList(responseRecords)
   }
 
-  const postUpdateApprover = async (id, approvers, _sigs) => {
+  const postUpdateApprover = async (id, approvers, _sigs, receiver, amount) => {
     const currentSafe = safe(currentWallet);
     const executeHash = await currentSafe.EXECUTE_HASH();
     const payload = []
 
-    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient2, sendAmount2, payload);
+    const messageHash = await currentSafe.getMessageHash(executeHash, receiver, amount, payload);
 
     const signer = await provider.getSigner()
 
     const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
     const sig = ethers.utils.splitSignature(flatSig);
     const sigsToSend = [..._sigs, sig]
+    console.log("sigs to send", sigsToSend)
 
     const requestOptions = {
       method: "POST",
@@ -187,27 +188,24 @@ const Wallets = (props) => {
     if (response.status !== 200) {
       throw new Error(data.error);
     }
-    console.log("Response from server: ", data);
 
     const bnQuorum = await currentSafe.quorum()
     const quorum = ethers.utils.formatUnits(bnQuorum, 0)
-    console.log("quorum is:", quorum)
     const item = await getApproves(id)
 
     const approves = item[0].approvers.length
     const sigs = item[0].sigs
-    console.log("approves is:", approves)
 
     if (quorum <= approves) {
       const safeSinger = currentSafe.connect(signer)
       // execute logic
-      console.log("sigs is", sigs)
-      const tx = await safeSinger.executeTest(
-        sendRecipient2,
-        sendAmount2,
+
+      const tx = await safeSinger.execute(
+        receiver,
+        amount,
         payload,
         sigs,
-        { value: sendAmount2 }
+        { value: amount }
       )
       await tx.wait()
     }
@@ -254,7 +252,7 @@ const Wallets = (props) => {
                     <span className="wallets-name">{wallet.name}</span>
                     <div style={{ height: 50 }} className="wallets-item" key={wallet.toString()}>
                       <div className="wallet-address">{wallet.addr}</div>
-                      {currentWallet != wallet && <button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>}
+                      {currentWallet != wallet.addr && <button className="add-owner" onClick={() => handleConnect(wallet)}>Connect</button>}
                     </div>
                   </div>
                 )}
@@ -276,7 +274,7 @@ const Wallets = (props) => {
                   <p>approved: {obj.approvers.length} times out of {currentThreshold} </p>
                   {!obj.approvers.includes(address) &&
                     <div>This transaction needs your signature:
-                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
+                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs, obj.receiver, obj.amount)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
                       </button>
                     </div>}
                 </div>

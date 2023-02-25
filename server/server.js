@@ -63,12 +63,12 @@ app.get("/get_approves_by_id/:id", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  const { wallet, receiver, amount, approvers } = req.body;
+  const { wallet, receiver, amount, approvers, sigs } = req.body;
 
-  if (!wallet || !receiver || !amount) {
+  if (!wallet || !receiver || !amount || !sigs) {
     return res.status(403).send({ error: "Нужно отправить и хэш и текст." });
   }
-  const record = new TxRecord({ wallet, receiver, amount, approvers });
+  const record = new TxRecord({ wallet, receiver, amount, approvers, sigs });
   try {
     await record.save();
   } catch (error) {

@@ -12,7 +12,7 @@ const SideBar = () => {
 
   const { currentChainnameContext, currentAddressContext } =
     useContext(Context);
-  console.log("currentChainnameContext", currentChainnameContext);
+  // console.log("currentChainnameContext", currentChainnameContext);
   // const currentAddress = contextState?.currentAccount;
 
   // useEffect(() => {
