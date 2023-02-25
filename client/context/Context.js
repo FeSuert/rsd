@@ -6,55 +6,60 @@ export const Context = createContext();
 export const Provider = (children) => {
   const [currentAddressContext, setCurrentAddressContext] = useState();
   const [currentChainnameContext, setCurrentChainnameContext] = useState();
-  const [currentChainID, setCurrentChainID] = useState();
+  const [isConnected, setIsConnected] = useState(false);
+  console.log("isConnected", isConnected);
 
   useEffect(() => {
     (() => {
-      //   try {
-      const getCurrentAddress = async () => {
-        const { ethereum } = window;
-        const currentAccount = await ethereum.request({
-          method: "eth_requestAccounts",
-        });
+      if (!isConnected) {
+        try {
+          const getCurrentAddress = async () => {
+            const { ethereum } = window;
+            const currentAccount = await ethereum.request({
+              method: "eth_requestAccounts",
+            });
+            setIsConnected(true);
+            setCurrentAddressContext(currentAccount);
+          };
+          getCurrentAddress();
 
-        setCurrentAddressContext(currentAccount);
-      };
-      getCurrentAddress();
-      window.ethereum.on("accountsChanged", (accounts) => {
-        getCurrentAddress();
-        // ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      });
+          window.ethereum.on("accountsChanged", (accounts) => {
+            getCurrentAddress();
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
     })();
+    // ethereum.removeListener('accountsChanged', handleAccountsChanged);
   }, []);
 
   useEffect(() => {
-    (async () => {
-      //   try {
-      const getCurrentChainName = async () => {
-        let chainName = await provider.getNetwork();
-        setCurrentChainnameContext(chainName.name);
-      };
-      getCurrentChainName();
+    if (!isConnected) {
+      (async () => {
+        try {
+          const getCurrentChainName = async () => {
+            let chainName = await provider.getNetwork();
+            setCurrentChainnameContext(chainName.name);
+          };
+          getCurrentChainName();
 
-      const getCurrentChainID = (async () => {
-        await ethereum.request({
-          method: "eth_chainId",
-        });
-        setCurrentChainID(getCurrentChainID);
+          window.ethereum.on("chainChanged", () => {
+            getCurrentChainName();
+            window.location.reload();
+          });
+        } catch (error) {
+          console.error(error);
+        }
       })();
-
-      window.ethereum.on("chainChanged", () => {
-        getCurrentChainName();
-        window.location.reload();
-      });
-    })();
+    }
   }, []);
 
   console.log("currentChainnameContext", currentChainnameContext);
 
   return (
     <Context.Provider
-      value={{ currentChainnameContext, currentAddressContext }}
+      value={{ currentChainnameContext, currentAddressContext, isConnected }}
       {...children}
     ></Context.Provider>
   );
