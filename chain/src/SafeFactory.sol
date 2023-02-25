@@ -24,6 +24,7 @@ contract SafeFactory {
 
         address safeAddress = address(safe);
         safes[msg.sender].push(SafeSample(_name, safeAddress));
+        hasSafe[msg.sender][safeAddress] = true;
 
         for (uint256 idx; idx < _signers.length; idx++) {
             if (!hasSafe[_signers[idx]][safeAddress]) {
