@@ -1,12 +1,234 @@
+import React, { useState, useEffect, useRef, createRef, useContext } from "react";
+import { ethers } from "ethers";
+import provider from "../scripts/provider";
+import safe from "../scripts/Safe.js";
+import safeFactory from "../scripts/SafeFactory.js";
 import Layout from "../components/layout";
+import { useAppContext } from "../hooks/useAppContext";
+import { Context } from "../context/Context";
+
 
 const Dashboard = () => {
+  const [address, setAddress] = useState();
+  const [wallets, setWallets] = useState([]);
+  const [currentWallet, setCurrentWallet] = useState("");
+  const [currentWalletOwners, setCurrentWalletOwners] = useState([]);
+  const [walletBalance, setWalletBalance] = useState();
+  const [walletThreshold, setWalletThreshold] = useState();
+  const [sendRecipient2, setSendRecepient2] = useState();
+  const [sendAmount2, setSendAmount2] = useState();
+  const [walletName, setWalletName] = useState();
+  const [inputs, setInputs] = useState([]);
+  const [waitList, setWaitList] = useState([]);
+  const [currentThreshold, setCurrentTrhreshold] = useState()
+  
+
+  const { currentChainnameContext, currentAddressContext } = useContext(Context);
+
+  useEffect(() => {
+    if(currentAddressContext){setAddress(currentAddressContext[0])}
+  }, [currentAddressContext])
+
+  useEffect(() => {
+    if (address) {
+        handleConnectWallet()
+        setWaitList([])
+        setWallets([])
+        setCurrentWallet()
+        setWalletBalance()
+        setWalletThreshold()
+        setWalletName()
+        setCurrentWalletOwners([])
+    }
+
+  }, [address])
+
+  const handleAddInput = () => {
+    setInputs([...inputs, ""]);
+  };
+
+  const handleInputChange = (index, value) => {
+    const newInputs = [...inputs];
+    newInputs[index] = value;
+    setInputs(newInputs);
+  };
+
+  const handleRemoveInput = (index) => {
+    setInputs(inputs.filter((_, i) => i !== index));
+  };
+
+  function handleGnosisChange(event) {
+    const index = event.target.value;
+    setSelectGnosis(index);
+  }
+
+  const inputRef = createRef();
+
+  const bnbChainId = "0x38";
+
+  const handleConnectWallet = async () => {
+    safeFactory.getSafes(address).then(async (d) => {
+      console.log(d)
+      setWallets(d);
+    });
+  };
+
+  const handleCreateTx = async (event) => {
+    event.preventDefault();
+    const amount1 = ethers.utils.parseEther(sendAmount2).toString()
+    const currentSafe = safe(currentWallet);
+    const executeHash = await currentSafe.EXECUTE_HASH();
+    const payload = []
+
+    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient2, amount1, payload);
+
+    const signer = await provider.getSigner()
+    const safeSinger = currentSafe.connect(signer)
+
+    const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
+    const sig = ethers.utils.splitSignature(flatSig);
+
+    const response = await postRecord(currentWallet, sendRecipient2, amount1, [address], [sig]);
+
+    const threshold = await safe(currentWallet).quorum()
+    setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
+    const responseRecords = await getRecordByWallet(currentWallet);
+    setWaitList(responseRecords)
+  };
+
+  const postRecord = async (wallet, receiver, amount, approvers, sigs) => {
+
+    const requestOptions = {
+      method: "POST",
+      body: JSON.stringify({ wallet, receiver, amount, approvers, sigs }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await fetch(`http://localhost:3003/`, requestOptions);
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
+    console.log("Response from server: ", data);
+  };
+
+  const getRecordByWallet = async (wallet) => {
+    const response = await fetch(
+      `http://localhost:3003/get_records_by_wallet/${wallet}`
+    );
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+
+    }
+    console.log("Response from server: : ", data);
+    return data.record;
+  };
+
+  async function handleConnect(wallet) {
+    setCurrentWallet(wallet.addr)
+    const currentSafe = safe(wallet.addr)
+    await currentSafe.getOwners()
+      .then(async (data) => {
+        setCurrentWalletOwners(data)
+      })
+
+    await provider.getBalance(currentSafe.address)
+      .then(async (data) => {
+        setWalletBalance(ethers.utils.formatUnits(data))
+      })
+
+    await currentSafe.name()
+    .then(async (data) => {
+      setWalletName(data)
+    })
+
+    await currentSafe.quorum()
+      .then(async (data) => {
+        setWalletThreshold(parseInt(data))
+      })
+
+    const threshold = await currentSafe.quorum()
+
+    setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
+    const response = await getRecordByWallet(currentWallet);
+    setWaitList(response)
+  }
+
+  const handleRefreshWaitlist = async () => {
+    const responseRecords = await getRecordByWallet(currentWallet);
+    setWaitList(responseRecords)
+  }
+
+  const postUpdateApprover = async (id, approvers, _sigs, receiver, amount) => {
+    const currentSafe = safe(currentWallet);
+    const executeHash = await currentSafe.EXECUTE_HASH();
+    const payload = []
+
+    const messageHash = await currentSafe.getMessageHash(executeHash, receiver, amount, payload);
+
+    const signer = await provider.getSigner()
+
+    const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
+    const sig = ethers.utils.splitSignature(flatSig);
+    const sigsToSend = [..._sigs, sig]
+    console.log("sigs to send", sigsToSend)
+
+    const requestOptions = {
+      method: "POST",
+      body: JSON.stringify({ id, approvers, sigsToSend }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await fetch(`http://localhost:3003/update_approvers`, requestOptions);
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
+
+    const bnQuorum = await currentSafe.quorum()
+    const quorum = ethers.utils.formatUnits(bnQuorum, 0)
+    const item = await getApproves(id)
+
+    const approves = item[0].approvers.length
+    const sigs = item[0].sigs
+
+    if (quorum <= approves) {
+      const safeSinger = currentSafe.connect(signer)
+      // execute logic
+
+      const tx = await safeSinger.execute(
+        receiver,
+        amount,
+        payload,
+        sigs,
+        { value: amount }
+      )
+      await tx.wait()
+    }
+  };
+
+  const getApproves = async (id) => {
+    const response = await fetch(
+      `http://localhost:3003/get_approves_by_id/${id}`
+    );
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw new Error(data.error);
+    }
+    console.log("Response from server: : ", data);
+    return data.record;
+  }
   return (
     <Layout>
       <div className="create-new-safe">
       <div className="grid-container">
           <div className="MuiGrid-item grid-item">
-            <h2 className="title">SuperGnosis Transactions</h2>
+            <h2 className="title">Dashboard</h2>
           </div>
           <div className="MuiGrid-item grid-item">
           <div className="card">
@@ -15,183 +237,32 @@ const Dashboard = () => {
                   <span className="progress-bar-fill"></span>
                 </span>
           </div>
-              <span className="card-title">
-              Queue
-              </span>
-              <div className="wallets">
-                <form>                  
-                  <div>
-                  Queued transactions will appear here
-                  </div>
-
-                  <hr className="divider" />
-                  <div>
-                    
-                  </div>
-                </form>
+          {address ? 
+              (
+              <div>
+                <span className="card-title">
+                  Newest Created Wallets
+                </span>
+                <div className="wallets">
+                  <ul class="my-list">
+                    {wallets.map((wallet) =>
+                      <li className="my-list">
+                        <span className="wallets-name">{wallet.name}: </span>
+                        <div className="" key={wallet.toString()}>
+                          <div className="wallet-address"> {wallet.addr}</div>
+                        </div>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </div>)
+                :
+              (<span className="card-title">
+                Connect to your Wallet!
+              </span>)
+              } 
               </div>
-              {/* <span className="card-title">
-              History
-              </span> */}
-              <div className="wallets">
-                <form>
-             
-<div class="bg-white pb-4 px-4 rounded-md w-full">
-      <div class="flex justify-between w-full pt-6 ">
-      <span className="card-title">
-              History
-              </span>
-      </div>
-  <div class="w-full flex justify-end px-2 mt-2">
-        <div class="w-full sm:w-64 inline-block relative ">   
-          <div class="pointer-events-none absolute pl-3 inset-y-0 left-0 flex items-center px-2 text-gray-300">          
           </div>
-        </div>
-      </div>
-    <div class="overflow-x-auto mt-6">
-      <table class="table-auto border-collapse w-full">
-        <thead>
-          <tr class="rounded-lg text-sm font-medium text-gray-700 text-left">
-            <th class="px-4 py-2 bg-gray-200 " >Sent to</th>
-            <th class="px-4 py-2 "></th>
-            <th class="px-4 py-2 "></th>
-            <th class="px-4 py-2 "></th>
-          </tr>
-        </thead>
-        <tbody class="text-sm font-normal text-gray-700">
-          <tr class="hover:bg-gray-100 border-b border-gray-200 py-10">
-            <td class="px-4 py-4">0x...</td>
-            <td class="px-4 py-4">-0.1 GOR</td>
-            <td class="px-4 py-4">4:02 AM</td>
-            <td class="px-4 py-4">Success</td>
-          </tr>
-          <tr class="hover:bg-gray-100 border-b border-gray-200 py-4">
-            <td class="px-4 py-4 flex items-center"> 
-            0x...
-            
-             </td>
-            <td class="px-4 py-4">-0.2 GOR</td>
-            <td class="px-4 py-4">3:58 AM</td>
-            <td class="px-4 py-4">Success</td>
-
-          </tr>
-          
-        </tbody>
-      </table>
-    </div>
-  	 <div id="pagination" class="w-full flex justify-center border-t border-gray-100 pt-4 items-center">
-        
-        <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g opacity="0.4">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M9 12C9 12.2652 9.10536 12.5196 9.29289 12.7071L13.2929 16.7072C13.6834 17.0977 14.3166 17.0977 14.7071 16.7072C15.0977 16.3167 15.0977 15.6835 14.7071 15.293L11.4142 12L14.7071 8.70712C15.0977 8.31659 15.0977 7.68343 14.7071 7.29289C14.3166 6.90237 13.6834 6.90237 13.2929 7.29289L9.29289 11.2929C9.10536 11.4804 9 11.7348 9 12Z" fill="#2C2C2C"/>
-</g>
-</svg>
-
-        <p class="leading-relaxed cursor-pointer mx-2 text-blue-600 hover:text-blue-600 text-sm">1</p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600" >2</p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600"> 3 </p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600"> 4 </p>
-        <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M15 12C15 11.7348 14.8946 11.4804 14.7071 11.2929L10.7071 7.2929C10.3166 6.9024 9.6834 6.9024 9.2929 7.2929C8.9024 7.6834 8.9024 8.3166 9.2929 8.7071L12.5858 12L9.2929 15.2929C8.9024 15.6834 8.9024 16.3166 9.2929 16.7071C9.6834 17.0976 10.3166 17.0976 10.7071 16.7071L14.7071 12.7071C14.8946 12.5196 15 12.2652 15 12Z" fill="#18A0FB"/>
-</svg>
-
-      </div>
-      <div class="overflow-x-auto mt-6">
-      <table class="table-auto border-collapse w-full">
-        <thead>
-          <tr class="rounded-lg text-sm font-medium text-gray-700 text-left">
-            <th class="px-4 py-2 bg-gray-200 " >Received from</th>
-            <th class="px-4 py-2 "></th>
-            <th class="px-4 py-2 "></th>
-            <th class="px-4 py-2 "></th>
-          </tr>
-        </thead>
-        <tbody class="text-sm font-normal text-gray-700">
-          <tr class="hover:bg-gray-100 border-b border-gray-200 py-10">
-            <td class="px-4 py-4">0x...</td>
-            <td class="px-4 py-4">0.1 GOR</td>
-            <td class="px-4 py-4">4:02 AM</td>
-            <td class="px-4 py-4">Success</td>
-          </tr>
-          <tr class="hover:bg-gray-100 border-b border-gray-200 py-4">
-            <td class="px-4 py-4 flex items-center"> 
-            0x...
-            
-             </td>
-            <td class="px-4 py-4">0.4 GOR</td>
-            <td class="px-4 py-4">3:58 AM</td>
-            <td class="px-4 py-4">Success</td>
-
-          </tr>
-          
-        </tbody>
-      </table>
-    </div>
-    <div id="pagination" class="w-full flex justify-center border-t border-gray-100 pt-4 items-center">
-        
-        <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g opacity="0.4">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M9 12C9 12.2652 9.10536 12.5196 9.29289 12.7071L13.2929 16.7072C13.6834 17.0977 14.3166 17.0977 14.7071 16.7072C15.0977 16.3167 15.0977 15.6835 14.7071 15.293L11.4142 12L14.7071 8.70712C15.0977 8.31659 15.0977 7.68343 14.7071 7.29289C14.3166 6.90237 13.6834 6.90237 13.2929 7.29289L9.29289 11.2929C9.10536 11.4804 9 11.7348 9 12Z" fill="#2C2C2C"/>
-</g>
-</svg>
-
-        <p class="leading-relaxed cursor-pointer mx-2 text-blue-600 hover:text-blue-600 text-sm">1</p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600" >2</p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600"> 3 </p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600"> 4 </p>
-        <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M15 12C15 11.7348 14.8946 11.4804 14.7071 11.2929L10.7071 7.2929C10.3166 6.9024 9.6834 6.9024 9.2929 7.2929C8.9024 7.6834 8.9024 8.3166 9.2929 8.7071L12.5858 12L9.2929 15.2929C8.9024 15.6834 8.9024 16.3166 9.2929 16.7071C9.6834 17.0976 10.3166 17.0976 10.7071 16.7071L14.7071 12.7071C14.8946 12.5196 15 12.2652 15 12Z" fill="#18A0FB"/>
-</svg>
-      </div>
-      <div class="overflow-x-auto mt-6">
-      <table class="table-auto border-collapse w-full">
-        <thead>
-          <tr class="rounded-lg text-sm font-medium text-gray-700 text-left">
-            <th class="px-4 py-2 bg-gray-200 " >Safe created</th>
-            <th class="px-4 py-2 "></th>
-            <th class="px-4 py-2 "></th>
-            <th class="px-4 py-2 "></th>
-          </tr>
-        </thead>
-        <tbody class="text-sm font-normal text-gray-700">
-          <tr class="hover:bg-gray-100 border-b border-gray-200 py-10">
-            <td class="px-4 py-4">Safe created by</td>
-            <td class="px-4 py-4">0x...</td>
-            <td class="px-4 py-4">3:32 AM</td>
-            <td class="px-4 py-4">Success</td>
-          </tr>
-          <tr class="hover:bg-gray-100 border-b border-gray-200 py-4">
-          <td class="px-4 py-4">Safe created by</td>
-            <td class="px-4 py-4">0x...</td>
-            <td class="px-4 py-4">1:41 PM</td>
-            <td class="px-4 py-4">Success</td>
-          </tr>
-          
-        </tbody>
-      </table>
-    </div>
-    </div>                 
-                  {/* <hr className="divider" /> */}
-                  <div id="pagination" class="w-full flex justify-center border-t border-gray-100 pt-4 items-center">
-        
-        <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g opacity="0.4">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M9 12C9 12.2652 9.10536 12.5196 9.29289 12.7071L13.2929 16.7072C13.6834 17.0977 14.3166 17.0977 14.7071 16.7072C15.0977 16.3167 15.0977 15.6835 14.7071 15.293L11.4142 12L14.7071 8.70712C15.0977 8.31659 15.0977 7.68343 14.7071 7.29289C14.3166 6.90237 13.6834 6.90237 13.2929 7.29289L9.29289 11.2929C9.10536 11.4804 9 11.7348 9 12Z" fill="#2C2C2C"/>
-</g>
-</svg>
-
-        <p class="leading-relaxed cursor-pointer mx-2 text-blue-600 hover:text-blue-600 text-sm">1</p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600" >2</p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600"> 3 </p>
-        <p class="leading-relaxed cursor-pointer mx-2 text-sm hover:text-blue-600"> 4 </p>
-        <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M15 12C15 11.7348 14.8946 11.4804 14.7071 11.2929L10.7071 7.2929C10.3166 6.9024 9.6834 6.9024 9.2929 7.2929C8.9024 7.6834 8.9024 8.3166 9.2929 8.7071L12.5858 12L9.2929 15.2929C8.9024 15.6834 8.9024 16.3166 9.2929 16.7071C9.6834 17.0976 10.3166 17.0976 10.7071 16.7071L14.7071 12.7071C14.8946 12.5196 15 12.2652 15 12Z" fill="#18A0FB"/>
-</svg>
-      </div>                 
-                </form>
-              </div>
-        </div>
-        </div>
         </div>
       </div>
 

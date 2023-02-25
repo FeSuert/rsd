@@ -74,12 +74,12 @@ const Wallets = (props) => {
 
   const handleCreateTx = async (event) => {
     event.preventDefault();
-
+    const amount1 = ethers.utils.parseEther(sendAmount2).toString()
     const currentSafe = safe(currentWallet);
     const executeHash = await currentSafe.EXECUTE_HASH();
     const payload = []
 
-    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient2, sendAmount2, payload);
+    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient2, amount1, payload);
 
     const signer = await provider.getSigner()
     const safeSinger = currentSafe.connect(signer)
@@ -87,7 +87,7 @@ const Wallets = (props) => {
     const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
     const sig = ethers.utils.splitSignature(flatSig);
 
-    const response = await postRecord(currentWallet, sendRecipient2, sendAmount2, [address], [sig]);
+    const response = await postRecord(currentWallet, sendRecipient2, amount1, [address], [sig]);
 
     const threshold = await safe(currentWallet).quorum()
     setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
@@ -270,11 +270,11 @@ const Wallets = (props) => {
                   <hr style={{ marginBottom: 5 }}></hr>
                   <div className="wallets-name">👉 id:<span className="wallet-address"> {idx} </span></div>
                   <div className="wallets-name">receiver:<span className="wallet-address"> {obj.receiver} </span></div>
-                  <div className="wallets-name">amount:<span className="wallet-address"> {obj.amount} </span></div>
+                  <div className="wallets-name">amount:<span className="wallet-address"> {obj.amount/1000000000000000000} eth </span></div>
                   <div className="wallets-name">approved:<span className="wallet-address"> {obj.approvers.length} out of {currentThreshold} </span></div>
                   {!obj.approvers.includes(address) &&
                     <div className="wallets-name">This transaction needs your signature:
-                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
+                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs, obj.receiver, obj.amount)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
                       </button>
                     </div>}
                 </div>
