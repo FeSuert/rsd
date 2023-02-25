@@ -898,8 +898,8 @@
       }
     },
     "src/SafeFactory.sol": {
-      "lastModificationDate": 1676954649713,
-      "contentHash": "0f2152b632aebc42748b33f91dbcec5b",
+      "lastModificationDate": 1677284615317,
+      "contentHash": "dd03bc9836bc4cef613650407b30c752",
       "sourceName": "src/SafeFactory.sol",
       "solcConfig": {
         "settings": {
