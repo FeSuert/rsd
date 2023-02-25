@@ -52,7 +52,7 @@ const Dashboard = () => {
       <table class="table-auto border-collapse w-full">
         <thead>
           <tr class="rounded-lg text-sm font-medium text-gray-700 text-left">
-            <th class="px-4 py-2 bg-gray-200 " >Sent</th>
+            <th class="px-4 py-2 bg-gray-200 " >Sent to</th>
             <th class="px-4 py-2 "></th>
             <th class="px-4 py-2 "></th>
             <th class="px-4 py-2 "></th>
@@ -70,7 +70,7 @@ const Dashboard = () => {
             0x...
             
              </td>
-            <td class="px-4 py-4">0.1 GOR</td>
+            <td class="px-4 py-4">-0.2 GOR</td>
             <td class="px-4 py-4">3:58 AM</td>
             <td class="px-4 py-4">Success</td>
 
@@ -100,7 +100,7 @@ const Dashboard = () => {
       <table class="table-auto border-collapse w-full">
         <thead>
           <tr class="rounded-lg text-sm font-medium text-gray-700 text-left">
-            <th class="px-4 py-2 bg-gray-200 " >Received</th>
+            <th class="px-4 py-2 bg-gray-200 " >Received from</th>
             <th class="px-4 py-2 "></th>
             <th class="px-4 py-2 "></th>
             <th class="px-4 py-2 "></th>
@@ -109,7 +109,7 @@ const Dashboard = () => {
         <tbody class="text-sm font-normal text-gray-700">
           <tr class="hover:bg-gray-100 border-b border-gray-200 py-10">
             <td class="px-4 py-4">0x...</td>
-            <td class="px-4 py-4">-0.1 GOR</td>
+            <td class="px-4 py-4">0.1 GOR</td>
             <td class="px-4 py-4">4:02 AM</td>
             <td class="px-4 py-4">Success</td>
           </tr>
@@ -118,7 +118,7 @@ const Dashboard = () => {
             0x...
             
              </td>
-            <td class="px-4 py-4">0.1 GOR</td>
+            <td class="px-4 py-4">0.4 GOR</td>
             <td class="px-4 py-4">3:58 AM</td>
             <td class="px-4 py-4">Success</td>
 
