@@ -248,7 +248,7 @@ const Wallets = (props) => {
               } 
               <div className="wallets">
                 {wallets.map((wallet) =>
-                  <div className="">
+                  <div className="wallet-view">
                     <span className="wallets-name">{wallet.name}</span>
                     <div style={{ height: 50 }} className="wallets-item" key={wallet.toString()}>
                       <div className="wallet-address">{wallet.addr}</div>
@@ -258,7 +258,7 @@ const Wallets = (props) => {
                 )}
               </div>
               {currentWallet ? (
-              <div>
+              <div className="wallet-view">
               <hr className="divider" />
               <span className="card-title">
                 Waitlist:
@@ -268,13 +268,13 @@ const Wallets = (props) => {
               <div style={{ marginLeft: 15, marginRight: 15 }}>{waitList.map((obj, idx) =>
                 <div>
                   <hr style={{ marginBottom: 5 }}></hr>
-                  <span>👉 id: {idx} / </span>
-                  <span>receiver: {obj.receiver} / </span>
-                  <span>amount: {obj.amount}</span>
-                  <p>approved: {obj.approvers.length} times out of {currentThreshold} </p>
+                  <div className="wallets-name">👉 id:<span className="wallet-address"> {idx} </span></div>
+                  <div className="wallets-name">receiver:<span className="wallet-address"> {obj.receiver} </span></div>
+                  <div className="wallets-name">amount:<span className="wallet-address"> {obj.amount} </span></div>
+                  <div className="wallets-name">approved:<span className="wallet-address"> {obj.approvers.length} out of {currentThreshold} </span></div>
                   {!obj.approvers.includes(address) &&
-                    <div>This transaction needs your signature:
-                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs, obj.receiver, obj.amount)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
+                    <div className="wallets-name">This transaction needs your signature:
+                      <button onClick={() => postUpdateApprover(obj._id, [...obj.approvers, address], obj.sigs)} className="add-owner" style={{ width: 80, height: 30, backgroundColor: "#C2E5D3" }}>Sign
                       </button>
                     </div>}
                 </div>

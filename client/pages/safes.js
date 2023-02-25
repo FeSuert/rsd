@@ -165,57 +165,59 @@ const Safes = (props) => {
                   <span className="progress-bar-fill"></span>
                 </span>
               </div>
-              <span className="card-title">
-                Select network and create your Safe
-              </span>
-              <div className="card-content">
-                <form onSubmit={handleCreateSafe}>
-                  <div className="input-field">
-                    <label for="input-field">Safe Name:</label>
-                    <input 
-                      required 
-                      id="input-field" 
-                      type="text" 
-                      placeholder="example-safe-name"
-                      value={walletName}
-                      onChange={(e) => setWalletName(e.target.value)}/>
-                  </div>
-                  {inputs.map((value, index) => (
-                    <div className="input-field" key={index}>
-                      <label for="input-field">Owner address:</label>
+              <div className="wallet-view">
+                <span className="card-title">
+                  Select network and create your Safe
+                </span>
+                <div className="card-content">
+                  <form onSubmit={handleCreateSafe}>
+                    <div className="input-field">
+                      <label for="input-field">Safe Name:</label>
                       <input 
-                        required id="input-field" 
+                        required 
+                        id="input-field" 
                         type="text" 
-                        placeholder="0x..."
-                        value={value}
-                        onChange={(e) => handleInputChange(index, e.target.value)}
-                      />
-                      <button className="add-owner" onClick={() => handleRemoveInput(index)}>Remove</button>
+                        placeholder="example-safe-name"
+                        value={walletName}
+                        onChange={(e) => setWalletName(e.target.value)}/>
                     </div>
-                  ))}
-                  <div className="add-owners-card">
-                  <button onClick={handleAddInput} className="add-owner" type="button">
-                    + Add new owner
-                  </button>
-                  {/* Select threshold */}
-                  <select  className="custom-select" required value={threshold} onChange={handleThresholdChange}>
-                    <option value="" selected disabled>Select Threshold</option>
-                    {options}
-                  </select>
-                  </div>
-                  <hr className="divider" />
-                  <div className="input-row">
-                    <div className="button-container">
-                      <button className="submit-button" type="submit">
-                      {creatingSafe ? (
-                          <span class="loader"></span>
-                        ) : (
-                          <p>Create</p>
-                        )}
-                      </button>
+                    {inputs.map((value, index) => (
+                      <div className="input-field" key={index}>
+                        <label for="input-field">Owner address:</label>
+                        <input 
+                          required id="input-field" 
+                          type="text" 
+                          placeholder="0x..."
+                          value={value}
+                          onChange={(e) => handleInputChange(index, e.target.value)}
+                        />
+                        <button className="add-owner" onClick={() => handleRemoveInput(index)}>Remove</button>
+                      </div>
+                    ))}
+                    <div className="add-owners-card">
+                    <button onClick={handleAddInput} className="add-owner" type="button">
+                      + Add new owner
+                    </button>
+                    {/* Select threshold */}
+                    <select  className="custom-select" required value={threshold} onChange={handleThresholdChange}>
+                      <option value="" selected disabled>Select Threshold</option>
+                      {options}
+                    </select>
                     </div>
-                  </div>
-                </form>
+                    <hr className="divider" />
+                    <div className="input-row">
+                      <div className="button-container">
+                        <button className="submit-button" type="submit">
+                        {creatingSafe ? (
+                            <span class="loader"></span>
+                          ) : (
+                            <p>Create</p>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
