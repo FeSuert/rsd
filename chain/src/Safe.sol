@@ -189,16 +189,5 @@ contract Safe {
         return keccak256(abi.encodePacked(_funcSignatureHash, _target, _amount, _payload, nonce));
     }
 
-    // ---
-
-    function executeTest(
-        address target,
-        uint256 value,
-        bytes calldata payload,
-        Signature[] calldata sigs
-    ) public payable {
-        (bool success, ) = target.call{value: value}(payload);
-    }
-
     receive() external payable {}
 }

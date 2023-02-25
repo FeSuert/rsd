@@ -74,12 +74,11 @@ const Wallets = (props) => {
 
   const handleCreateTx = async (event) => {
     event.preventDefault();
-    const amount1 = ethers.utils.parseEther(sendAmount2).toString()
     const currentSafe = safe(currentWallet);
     const executeHash = await currentSafe.EXECUTE_HASH();
     const payload = []
 
-    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient2, amount1, payload);
+    const messageHash = await currentSafe.getMessageHash(executeHash, sendRecipient2, sendAmount2, payload);
 
     const signer = await provider.getSigner()
     const safeSinger = currentSafe.connect(signer)
@@ -87,7 +86,7 @@ const Wallets = (props) => {
     const flatSig = await signer.signMessage(ethers.utils.arrayify(messageHash))
     const sig = ethers.utils.splitSignature(flatSig);
 
-    const response = await postRecord(currentWallet, sendRecipient2, amount1, [address], [sig]);
+    const response = await postRecord(currentWallet, sendRecipient2, sendAmount2, [address], [sig]);
 
     const threshold = await safe(currentWallet).quorum()
     setCurrentTrhreshold(ethers.utils.formatUnits(threshold, 0))
@@ -199,8 +198,8 @@ const Wallets = (props) => {
     if (quorum <= approves) {
       const safeSinger = currentSafe.connect(signer)
       // execute logic
-      console.log(">>>", receiver, amount, payload, sigs)
-      const tx = await safeSinger.executeTest(
+
+      const tx = await safeSinger.execute(
         receiver,
         amount,
         payload,
