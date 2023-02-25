@@ -200,7 +200,7 @@ const Wallets = (props) => {
       const safeSinger = currentSafe.connect(signer)
       // execute logic
       console.log(">>>", receiver, amount, payload, sigs)
-      const tx = await safeSinger.execute(
+      const tx = await safeSinger.executeTest(
         receiver,
         amount,
         payload,

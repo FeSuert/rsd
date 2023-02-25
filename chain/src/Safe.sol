@@ -189,5 +189,37 @@ contract Safe {
         return keccak256(abi.encodePacked(_funcSignatureHash, _target, _amount, _payload, nonce));
     }
 
+    // ---
+
+    function executeTest(
+        address target,
+        uint256 value,
+        bytes calldata payload,
+        Signature[] calldata sigs
+    ) public payable {
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19Ethereum Signed Message:\n32",
+                keccak256(
+                    abi.encodePacked(EXECUTE_HASH, target, value, payload, nonce++)
+                )
+            )
+        );
+
+        address sigAddress = ecrecover(
+            digest,
+            sigs[0].v,
+            sigs[0].r,
+            sigs[0].s
+        );
+
+        if (isSigner[sigAddress]) {
+            (bool success, ) = target.call{value: value}(payload);
+        } else {
+            revert(">>> wrong address");
+        }
+
+    }
+
     receive() external payable {}
 }

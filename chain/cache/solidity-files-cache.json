@@ -858,8 +858,8 @@
       }
     },
     "src/Safe.sol": {
-      "lastModificationDate": 1677299667392,
-      "contentHash": "a0c34c1a6d8b3f1391e76fca3fe8a058",
+      "lastModificationDate": 1677340054557,
+      "contentHash": "96edd37d6a2f94c3beee0a323c9d6ec1",
       "sourceName": "src/Safe.sol",
       "solcConfig": {
         "settings": {
