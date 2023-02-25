@@ -4,8 +4,14 @@ pragma solidity ^0.8.10;
 import "./Safe.sol";
 
 contract SafeFactory {
-    mapping(address => address[]) public safes;
+    mapping(address => SafeSample[]) public safes;
     mapping(address => bool) public isSafe;
+    mapping(address => mapping(address => bool)) public hasSafe;
+
+    struct SafeSample {
+        string name;
+        address addr;
+    }
 
     event SafeCreation(address creator, address safe);
 
@@ -17,10 +23,13 @@ contract SafeFactory {
         Safe safe = new Safe(_name, _signers, _quorum);
 
         address safeAddress = address(safe);
-        safes[msg.sender].push(safeAddress);
+        safes[msg.sender].push(SafeSample(_name, safeAddress));
 
         for (uint256 idx; idx < _signers.length; idx++) {
-            safes[_signers[idx]].push(safeAddress);
+            if (!hasSafe[_signers[idx]][safeAddress]) {
+                safes[_signers[idx]].push(SafeSample(_name, safeAddress));
+                hasSafe[_signers[idx]][safeAddress] = true;
+            }
         }
 
         isSafe[safeAddress] = true;
@@ -34,7 +43,7 @@ contract SafeFactory {
         return safes[creator].length;
     }
 
-    function getSafes(address creator) public view returns (address[] memory) {
-        return safes[creator];
+    function getSafes(address addr) public view returns (SafeSample[] memory) {
+        return safes[addr];
     }
 }
