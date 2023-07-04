@@ -23,7 +23,7 @@ ul.my-list {
     font-weight: bold;
     font-variant-numeric: tabular-nums;
     align-self: flex-start;
-    background-image: linear-gradient(to bottom, #80b3ff, #ffccff);
+    background-image: linear-gradient(to bottom, #ffffff, #ffccff);
     background-attachment: fixed;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
